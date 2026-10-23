@@ -15,16 +15,19 @@ import { isAuthenticated, loginUser } from "../../utils/auth";
 function CounsellorLogin() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
+
+    console.log("clicked");
+    console.log(username, password);
     e.preventDefault();
 
-    if (!email.trim() || !password) {
-      toast.error("Please enter email and password.");
+    if (!username.trim() || !password) {
+      toast.error("Please enter username and password.");
       return;
     }
 
@@ -32,7 +35,8 @@ function CounsellorLogin() {
       setLoading(true);
 
       const result = await loginUser({
-        email,
+        username,
+        email: username,
         password,
         role: "counsellor",
       });
@@ -49,7 +53,7 @@ function CounsellorLogin() {
 
       toast.error(
         err.response?.data?.message ||
-          "Invalid credentials or server error."
+        "Invalid credentials"
       );
     } finally {
       setLoading(false);
@@ -80,11 +84,11 @@ function CounsellorLogin() {
           {/* Centered logo without white container */}
 
           <div className="relative z-10 w-full">
-            <div className="flex w-full items-center justify-center">
+            <div className="mb-10 inline-flex items-center gap-3 rounded-xl bg-white px-4 py-3">
               <img
                 src={logo}
-                alt="Bi Academy Logo"
-                className="h-36 w-auto max-w-full object-contain xl:h-44"
+                alt="Bia Logo"
+                className="h-32 w-auto object-contain"
               />
             </div>
 
@@ -142,14 +146,14 @@ function CounsellorLogin() {
             <div className="mb-9 flex justify-center md:hidden">
               <img
                 src={logo}
-                alt="Bi Talents Logo"
+                alt="Bia Logo"
                 className="h-24 w-auto max-w-full object-contain"
               />
             </div>
 
             {/* Heading */}
             <div className="mb-9">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-blue-600">
                 Welcome back
               </p>
 
@@ -167,10 +171,10 @@ function CounsellorLogin() {
               {/* Email */}
               <div>
                 <label
-                  htmlFor="email"
+                  htmlFor="username"
                   className="mb-2 block text-sm font-semibold text-slate-700"
                 >
-                  Email address
+                  Username
                 </label>
 
                 <div className="group relative">
@@ -180,12 +184,12 @@ function CounsellorLogin() {
                   />
 
                   <input
-                    id="email"
-                    type="email"
+                    id="username"
+                    type="text"
                     autoComplete="username"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3.5 pl-11 pr-4 text-sm text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                     required
                   />
@@ -241,7 +245,7 @@ function CounsellorLogin() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition duration-200 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/20 focus:outline-none focus:ring-4 focus:ring-blue-500/25 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
+                className="group mt-2 flex w-full items-center cursor-pointer justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition duration-200 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/20 focus:outline-none focus:ring-4 focus:ring-blue-500/25 disabled:translate-y-0  disabled:opacity-60"
               >
                 {loading ? (
                   <>
@@ -257,6 +261,17 @@ function CounsellorLogin() {
                   </>
                 )}
               </button>
+
+              {/* Register button */}
+              <button
+                type="button"
+                onClick={() => navigate("/counsellor/register")}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-blue-200 bg-white py-3.5 text-sm font-semibold text-blue-700 transition duration-200 hover:border-blue-400 hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-500/15 cursor-pointer"
+              >
+                Create an account
+                <span className="text-lg">→</span>
+              </button>
+
             </form>
 
             {/* Footer */}

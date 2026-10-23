@@ -280,9 +280,7 @@ function AdminAddLead() {
             <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
               Add New Lead
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Register an incoming prospective student lead, assign counsellor, and track source.
-            </p>
+
           </div>
 
           <div className="flex items-center gap-3">
@@ -478,9 +476,7 @@ function AdminAddLead() {
                 <User className="h-5 w-5 text-blue-600" />
                 <h2 className="text-lg font-bold">Personal Information</h2>
               </div>
-              <p className="mt-1 text-xs text-slate-500">
-                Contact and biographical details of the prospective student.
-              </p>
+
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2">

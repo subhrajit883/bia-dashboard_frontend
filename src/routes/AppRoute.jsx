@@ -37,6 +37,8 @@ import CounsellorEditLead from "../pages/CounsellorPages/CounsellorEditLead";
 import CounsellorAddStudent from "../pages/CounsellorPages/CounsellorAddStudent";
 import CounsellorStudent from "../pages/CounsellorPages/CounsellorStudent";
 import CounsellorEditStudent from "../pages/CounsellorPages/CounsellorEditStudent";
+import CounsellorEmail from "../pages/CounsellorPages/CounsellorEmail";
+import CounsellorSendEmail from "../pages/CounsellorPages/CounsellorSendEmail";
 
 const AppRoute = () => {
     return (
@@ -113,6 +115,8 @@ const AppRoute = () => {
                     <Route path="/counsellor/editstudent/:id" element={<CounsellorEditStudent />} />
                     <Route path="/counsellor/students/edit/:id" element={<CounsellorEditStudent />} />
                     <Route path="/counsellor/students" element={<CounsellorStudent />} />
+                    <Route path="/counsellor/emailtemplate" element={<CounsellorEmail />} />
+                    <Route path="/counsellor/emails" element={<CounsellorSendEmail />} />
                 </Route>
 
             </Routes>

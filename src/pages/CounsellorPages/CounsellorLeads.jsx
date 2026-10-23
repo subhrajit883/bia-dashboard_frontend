@@ -766,10 +766,10 @@ function CounsellorLeads() {
                             <table className="w-full text-left border-collapse text-xs">
                                 <thead>
                                     <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                                        <th className="px-5 py-4">Lead Name &amp; Contact</th>
+                                        <th className="px-5 py-4">Lead</th>
                                         <th className="px-5 py-4">Type / Source</th>
                                         <th className="px-5 py-4">Enquiry Date</th>
-                                        <th className="px-5 py-4">Interested Courses</th>
+                                        <th className="px-5 py-4">Interested Course(s)</th>
                                         <th className="px-5 py-4">Assigned Counsellor</th>
                                         <th className="px-5 py-4">Status</th>
                                         <th className="px-5 py-4">Conversion</th>
@@ -916,7 +916,7 @@ function CounsellorLeads() {
                                                             className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 transition hover:bg-slate-50 hover:border-slate-300 hover:text-blue-700"
                                                         >
                                                             <Eye className="h-3.5 w-3.5 text-slate-500" />
-                                                            Details
+                                                            {/* Details */}
                                                         </Link>
 
                                                         {/* Edit Page Link */}
@@ -927,7 +927,7 @@ function CounsellorLeads() {
                                                             className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 transition hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700"
                                                         >
                                                             <SquarePen className="h-3.5 w-3.5 text-slate-500 hover:text-amber-600" />
-                                                            Edit
+                                                            {/* Edit */}
                                                         </Link>
 
                                                         {/* Follow-up Button */}
@@ -938,7 +938,7 @@ function CounsellorLeads() {
                                                             className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 transition hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
                                                         >
                                                             <CalendarClock className="h-3.5 w-3.5 text-blue-600" />
-                                                            Follow-up
+                                                            {/* Follow-up */}
                                                         </button>
 
                                                         {/* Convert Button (Admin Only) */}

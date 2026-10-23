@@ -50,11 +50,14 @@ export const clearAuthData = () => {
 
 export const isAuthenticated = () => Boolean(getToken());
 
-export const loginUser = async ({ email, password, role = "counsellor" }) => {
+export const loginUser = async ({ username, password, role = "counsellor" }) => {
+  const identifier = (username || email || "").trim();
+
   const response = await axios.post(
     authUrl.login,
     {
-      email: email.trim(),
+      // email: (email || identifier).trim(),
+      username: (username || identifier).trim(),
       password,
       role,
     },
@@ -65,10 +68,10 @@ export const loginUser = async ({ email, password, role = "counsellor" }) => {
   const data =
     responseData?.data?.token !== undefined
       ? {
-          ...responseData.data,
-          success: responseData.success,
-          message: responseData.message,
-        }
+        ...responseData.data,
+        success: responseData.success,
+        message: responseData.message,
+      }
       : responseData?.message?.success !== undefined
         ? responseData.message
         : responseData?.data?.success !== undefined

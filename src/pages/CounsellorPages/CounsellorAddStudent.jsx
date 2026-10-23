@@ -880,8 +880,8 @@ function CounsellorAddStudent() {
                           key={course._id}
                           onClick={() => toggleCourse(course._id)}
                           className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-all ${isSelected
-                              ? "border-blue-600 bg-blue-50/70 shadow-xs ring-2 ring-blue-500/20"
-                              : "border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100/60"
+                            ? "border-blue-600 bg-blue-50/70 shadow-xs ring-2 ring-blue-500/20"
+                            : "border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100/60"
                             }`}
                         >
                           <div className="mt-0.5 shrink-0 text-blue-600">

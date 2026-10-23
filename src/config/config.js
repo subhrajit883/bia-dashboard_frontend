@@ -41,3 +41,18 @@ export const counsellorPerformanceUrl = {
   performance: `${BASE_URL}/api/counsellors/performance`,
   report: `${BASE_URL}/api/reports/counsellor-performance`
 };
+
+export const emailTemplateUrl = {
+  templates: `${BASE_URL}/api/emails/templates`,
+  templateById: (id) => `${BASE_URL}/api/emails/templates/${id}`,
+  send: `${BASE_URL}/api/emails/send`,
+  logs: `${BASE_URL}/api/emails/logs`,
+};
+
+export const emailUrl = {
+  templates: `${BASE_URL}/api/emails/templates`,
+  templateById: (id) => `${BASE_URL}/api/emails/templates/${id}`,
+  send: `${BASE_URL}/api/emails/send`,
+  logs: `${BASE_URL}/api/emails/logs`,
+};
+

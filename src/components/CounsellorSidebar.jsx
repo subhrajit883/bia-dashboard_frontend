@@ -18,7 +18,7 @@ import logo from "../assets/bia.png";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { FaHeart, FaUserPlus } from "react-icons/fa";
 import { PiStudentBold } from "react-icons/pi";
-import { Mail } from "lucide-react";
+import { Mail, Send } from "lucide-react";
 
 const NAV_ITEMS = [
     { label: "Dashboard", icon: FiLayout, to: "/counsellor/dashboard" },
@@ -26,7 +26,8 @@ const NAV_ITEMS = [
     { label: "All Leads", icon: FiUsers, to: "/counsellor/leads" },
     { label: "Add Student", icon: FaUserPlus, to: "/counsellor/addstudent" },
     { label: "All Students", icon: PiStudentBold, to: "/counsellor/students" },
-    { label: "Emails", icon: Mail, to: "/counsellor/emails" },
+    { label: "Emails Template", icon: Mail, to: "/counsellor/emailtemplate" },
+    { label: "Send Emails", icon: Send, to: "/counsellor/emails" },
     // { label: "Settings", icon: FiSettings, to: "/admin/settings" },
 ];
 
@@ -39,6 +40,8 @@ const CounsellorSidebar = () => {
 
     const CounsellorLogout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("user");
         window.location.href = "/counsellor/login";
     };
     return (

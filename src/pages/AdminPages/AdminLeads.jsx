@@ -769,7 +769,7 @@ function AdminLeads() {
                                         <th className="px-5 py-4">Lead </th>
                                         <th className="px-5 py-4">Type </th>
                                         <th className="px-5 py-4">Enquiry On</th>
-                                        <th className="px-5 py-4">Interested Courses</th>
+                                        <th className="px-5 py-4">Interested Course(s)</th>
                                         <th className="px-5 py-4">Assgn. Counsellor</th>
                                         <th className="px-5 py-4">Status</th>
                                         <th className="px-5 py-4">Conversion</th>
@@ -941,7 +941,7 @@ function AdminLeads() {
                                                         </button>
 
                                                         {/* Convert Button (Admin Only) */}
-                                                        {!isConverted ? (
+                                                        {!isConverted && (
                                                             <button
                                                                 type="button"
                                                                 onClick={() => openConvertModal(lead)}
@@ -951,10 +951,6 @@ function AdminLeads() {
                                                                 <UserPlus className="h-3.5 w-3.5" />
 
                                                             </button>
-                                                        ) : (
-                                                            <span className="rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-400">
-                                                                Done
-                                                            </span>
                                                         )}
                                                     </div>
                                                 </td>

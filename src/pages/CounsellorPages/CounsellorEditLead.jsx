@@ -219,7 +219,7 @@ function CounsellorEditLead() {
           if (!location.state?.lead) {
             setLoadError(
               leadRes.error.response?.data?.message ||
-                "Unable to load lead details from the server."
+              "Unable to load lead details from the server."
             );
           }
         } else {

@@ -269,7 +269,7 @@ function CounsellorAddLead() {
                     <div>
                         <div className="flex items-center gap-2">
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-700">
-                                <Sparkles className="h-3.5 w-3.5" />
+
                                 Counsellor Workspace
                             </span>
                             <span className="text-xs text-slate-400">•</span>
@@ -280,9 +280,7 @@ function CounsellorAddLead() {
                         <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
                             Add New Lead
                         </h1>
-                        <p className="mt-1 text-sm text-slate-500">
-                            Register an incoming prospective student lead, assign counsellor, and track source.
-                        </p>
+
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -478,9 +476,7 @@ function CounsellorAddLead() {
                                 <User className="h-5 w-5 text-blue-600" />
                                 <h2 className="text-lg font-bold">Personal Information</h2>
                             </div>
-                            <p className="mt-1 text-xs text-slate-500">
-                                Contact and biographical details of the prospective student.
-                            </p>
+
                         </div>
 
                         <div className="grid gap-6 sm:grid-cols-2">
@@ -545,6 +541,8 @@ function CounsellorAddLead() {
                                         id="lead-phone"
                                         name="phone"
                                         type="tel"
+                                        maxLength={10}
+
                                         required
                                         value={formData.phone}
                                         onChange={handleChange}
@@ -651,9 +649,6 @@ function CounsellorAddLead() {
                                 <BookOpen className="h-5 w-5 text-blue-600" />
                                 <h2 className="text-lg font-bold">Course Selection & Assignment</h2>
                             </div>
-                            <p className="mt-1 text-xs text-slate-500">
-                                Choose the courses the lead is interested in and assign a dedicated counsellor.
-                            </p>
                         </div>
 
                         {/* Enrolled Courses Multi-select */}
@@ -661,7 +656,7 @@ function CounsellorAddLead() {
                             <div className="mb-3 flex items-center justify-between">
                                 <div>
                                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                                        Enrolled / Interested Courses (enrolledCourses){" "}
+                                        Enrolled / Interested Courses{" "}
                                         <span className="text-rose-500">*</span>
                                     </label>
                                     <p className="text-xs text-slate-500 mt-0.5">
