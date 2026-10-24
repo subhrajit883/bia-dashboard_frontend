@@ -26,10 +26,6 @@ const PRESET_DOCUMENTS = [
   "Aadhar card",
   "Voter Card",
   "PAN card",
-  "10th Marksheet",
-  "12th Marksheet",
-  "Graduation Certificate",
-  "Passport Size Photo",
 ];
 
 const getTodayDate = () => {
@@ -1152,10 +1148,10 @@ function CounsellorAddStudent() {
                   </div>
                   <p className="mt-1 text-xs text-slate-500">
                     Upload verification documents (e.g. Aadhar card, Voter card,
-                    certificates). Endpoint:{" "}
-                    <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-blue-700">
+                    certificates).<span className="text-red-500 font-semibold"> File limit is 200 kb</span>
+                    {/* <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-blue-700">
                       /api/students/&#123;id&#125;/documents
-                    </code>
+                    </code> */}
                   </p>
                 </div>
 
@@ -1465,10 +1461,10 @@ function CounsellorAddStudent() {
               </Link>
 
               <Link
-                to="/counsellor/dashboard"
+                to="/counsellor/leads"
                 className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl border border-transparent px-6 py-3 text-sm font-semibold text-slate-500 hover:text-slate-800 transition"
               >
-                Go to Dashboard
+                Go to Leads
               </Link>
             </div>
           </div>

@@ -18,10 +18,10 @@ import {
     Eye,
     PhoneCall,
     ShieldCheck,
-    UserPlus,
     UserX,
     Power,
     BarChart3,
+    Trash2,
 } from "lucide-react";
 import { counsellorUrl, BASE_URL } from "../../config/config";
 
@@ -29,6 +29,8 @@ function AdminCounsellor() {
     const [counsellors, setCounsellors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [togglingId, setTogglingId] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
+    const [counsellorToDelete, setCounsellorToDelete] = useState(null);
     const [copiedField, setCopiedField] = useState(null);
 
     // Filters state
@@ -70,6 +72,7 @@ function AdminCounsellor() {
     }, []);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadCounsellors(true);
     }, [loadCounsellors]);
 
@@ -141,6 +144,42 @@ function AdminCounsellor() {
             );
         } finally {
             setTogglingId(null);
+        }
+    };
+
+    // Handle delete counsellor
+    const handleDeleteCounsellor = async (counsellor) => {
+        if (!counsellor?._id) return;
+
+        try {
+            setDeletingId(counsellor._id);
+            const adminToken = localStorage.getItem("adminToken") || localStorage.getItem("token");
+            const headers = adminToken ? { Authorization: `Bearer ${adminToken}` } : {};
+
+            const url = counsellorUrl?.deleteCounsellor
+                ? counsellorUrl.deleteCounsellor(counsellor._id)
+                : `${BASE_URL}/api/counsellors/${counsellor._id}`;
+
+            const response = await axios.delete(url, { headers });
+
+            // Remove from local list
+            setCounsellors((prev) => prev.filter((c) => c._id !== counsellor._id));
+
+            // Close details modal if open with this counsellor
+            setSelectedCounsellor((prev) => (prev && prev._id === counsellor._id ? null : prev));
+
+            toast.success(
+                response?.data?.message ||
+                `Counsellor "${counsellor.name}" deleted successfully!`
+            );
+            setCounsellorToDelete(null);
+        } catch (err) {
+            console.error("Delete counsellor error:", err.response?.data || err);
+            toast.error(
+                err.response?.data?.message || err.message || "Failed to delete counsellor."
+            );
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -646,6 +685,21 @@ function AdminCounsellor() {
                                                             <Eye className="h-3.5 w-3.5 text-slate-500" />
                                                             Details
                                                         </button>
+
+                                                        <button
+                                                            type="button"
+                                                            disabled={deletingId === counsellor._id}
+                                                            onClick={() => setCounsellorToDelete(counsellor)}
+                                                            title="Delete Counsellor"
+                                                            className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-rose-200 bg-rose-50/60 px-2.5 py-1.5 text-[11px] font-semibold text-rose-600 transition hover:bg-rose-100 hover:border-rose-300 hover:text-rose-700 disabled:opacity-50"
+                                                        >
+                                                            {deletingId === counsellor._id ? (
+                                                                <RefreshCw className="h-3.5 w-3.5 animate-spin text-rose-600" />
+                                                            ) : (
+                                                                <Trash2 className="h-3.5 w-3.5 text-rose-600" />
+                                                            )}
+                                                            <span className="hidden sm:inline">Delete</span>
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -779,14 +833,99 @@ function AdminCounsellor() {
                                 </div>
                             </div>
 
-                            {/* Modal Close Action */}
-                            <div className="pt-3 border-t border-slate-100 flex justify-end">
+                            {/* Modal Close & Delete Action */}
+                            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                                <button
+                                    type="button"
+                                    onClick={() => setCounsellorToDelete(selectedCounsellor)}
+                                    className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-100 transition"
+                                >
+                                    <Trash2 className="h-3.5 w-3.5 text-rose-600" />
+                                    Delete Counsellor
+                                </button>
                                 <button
                                     type="button"
                                     onClick={() => setSelectedCounsellor(null)}
-                                    className="cursor-pointer rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-semibold text-white hover:bg-slate-800 transition"
+                                    className="cursor-pointer rounded-xl bg-slate-900 px-5 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition"
                                 >
                                     Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ========================================================================= */}
+                {/* 6. DELETE COUNSELLOR CONFIRMATION MODAL */}
+                {/* ========================================================================= */}
+                {counsellorToDelete && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-xs">
+                        <div className="relative w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl sm:p-7 space-y-4">
+                            {/* Danger Icon & Heading */}
+                            <div className="flex items-start gap-4">
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
+                                    <Trash2 className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h3 className="text-base font-bold text-slate-900">
+                                        Delete Counsellor?
+                                    </h3>
+                                    <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                                        Are you sure you want to permanently delete{" "}
+                                        <span className="font-bold text-slate-900">
+                                            {counsellorToDelete.name}
+                                        </span>{" "}
+                                        {counsellorToDelete.username && (
+                                            <span className="text-slate-600 font-mono">
+                                                (@{counsellorToDelete.username})
+                                            </span>
+                                        )}
+                                        ? This action cannot be undone and will delete the counsellor from the system.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Details Pill */}
+                            {/* <div className="rounded-xl border border-rose-100 bg-rose-50/50 p-3 text-xs text-rose-900 space-y-1">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-rose-700/80 font-medium">Counsellor ID:</span>
+                                    <span className="font-mono font-semibold">{counsellorToDelete._id}</span>
+                                </div>
+                                {counsellorToDelete.email && (
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-rose-700/80 font-medium">Email:</span>
+                                        <span className="font-semibold">{counsellorToDelete.email}</span>
+                                    </div>
+                                )}
+                            </div> */}
+
+                            {/* Action Buttons */}
+                            <div className="flex items-center justify-end gap-3 pt-2">
+                                <button
+                                    type="button"
+                                    disabled={deletingId === counsellorToDelete._id}
+                                    onClick={() => setCounsellorToDelete(null)}
+                                    className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={deletingId === counsellorToDelete._id}
+                                    onClick={() => handleDeleteCounsellor(counsellorToDelete)}
+                                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-rose-700 disabled:opacity-50"
+                                >
+                                    {deletingId === counsellorToDelete._id ? (
+                                        <>
+                                            <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                                            <span>Deleting...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                            <span>Yes, Delete Counsellor</span>
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>

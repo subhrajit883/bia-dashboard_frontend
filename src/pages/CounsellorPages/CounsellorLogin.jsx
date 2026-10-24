@@ -43,7 +43,7 @@ function CounsellorLogin() {
 
       if (result.success) {
         toast.success("Login successful!");
-        navigate("/counsellor/dashboard", { replace: true });
+        navigate("/counsellor/leads", { replace: true });
         return;
       }
 
@@ -62,7 +62,7 @@ function CounsellorLogin() {
 
   useEffect(() => {
     if (isAuthenticated()) {
-      navigate("/counsellor/dashboard", { replace: true });
+      navigate("/counsellor/leads", { replace: true });
     }
   }, [navigate]);
 

@@ -1714,10 +1714,10 @@ function CounsellorEditStudent() {
                             </Link>
 
                             <Link
-                                to="/counsellor/dashboard"
+                                to="/counsellor/leads"
                                 className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl border border-transparent px-6 py-3 text-sm font-semibold text-slate-500 hover:text-slate-800 transition"
                             >
-                                Go to Dashboard
+                                Go to Leads
                             </Link>
                         </div>
                     </div>

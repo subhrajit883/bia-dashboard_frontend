@@ -212,8 +212,8 @@ function EmailRichTextEditor({
                             type="button"
                             onClick={() => setActiveTab("visual")}
                             className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${activeTab === "visual"
-                                    ? "bg-emerald-600 text-white shadow-xs"
-                                    : "text-slate-600 hover:text-slate-900"
+                                ? "bg-emerald-600 text-white shadow-xs"
+                                : "text-slate-600 hover:text-slate-900"
                                 }`}
                         >
                             <Edit3 className="h-3.5 w-3.5" />
@@ -223,8 +223,8 @@ function EmailRichTextEditor({
                             type="button"
                             onClick={() => setActiveTab("plain")}
                             className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${activeTab === "plain"
-                                    ? "bg-emerald-600 text-white shadow-xs"
-                                    : "text-slate-600 hover:text-slate-900"
+                                ? "bg-emerald-600 text-white shadow-xs"
+                                : "text-slate-600 hover:text-slate-900"
                                 }`}
                         >
                             <Type className="h-3.5 w-3.5" />
@@ -234,8 +234,8 @@ function EmailRichTextEditor({
                             type="button"
                             onClick={() => setActiveTab("code")}
                             className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${activeTab === "code"
-                                    ? "bg-emerald-600 text-white shadow-xs"
-                                    : "text-slate-600 hover:text-slate-900"
+                                ? "bg-emerald-600 text-white shadow-xs"
+                                : "text-slate-600 hover:text-slate-900"
                                 }`}
                         >
                             <Code2 className="h-3.5 w-3.5" />
@@ -245,8 +245,8 @@ function EmailRichTextEditor({
                             type="button"
                             onClick={() => setActiveTab("preview")}
                             className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${activeTab === "preview"
-                                    ? "bg-emerald-600 text-white shadow-xs"
-                                    : "text-slate-600 hover:text-slate-900"
+                                ? "bg-emerald-600 text-white shadow-xs"
+                                : "text-slate-600 hover:text-slate-900"
                                 }`}
                         >
                             <Eye className="h-3.5 w-3.5" />

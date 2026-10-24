@@ -39,6 +39,8 @@ import CounsellorStudent from "../pages/CounsellorPages/CounsellorStudent";
 import CounsellorEditStudent from "../pages/CounsellorPages/CounsellorEditStudent";
 import CounsellorEmail from "../pages/CounsellorPages/CounsellorEmail";
 import CounsellorSendEmail from "../pages/CounsellorPages/CounsellorSendEmail";
+import AdminSendEmail from "../pages/AdminPages/AdminSendEmail";
+import AdminEmail from "../pages/AdminPages/AdminEmail";
 
 const AppRoute = () => {
     return (
@@ -65,9 +67,9 @@ const AppRoute = () => {
                 >
                     <Route
                         path="/admin"
-                        element={<Navigate to="/admin/dashboard" replace />}
+                        element={<Navigate to="/admin/leads" replace />}
                     />
-                    <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
                     <Route path="/admin/sources" element={<AdminSources />} />
                     <Route path="/admin/courses" element={<AdminCourses />} />
                     <Route path="/admin/addstudent" element={<AdminAddStudent />} />
@@ -82,6 +84,8 @@ const AppRoute = () => {
                     <Route path="/admin/leads/:id" element={<AdminLeadDetails />} />
                     <Route path="/admin/counsellors" element={<AdminCounsellor />} />
                     <Route path="/admin/counsellors-performance" element={<AdminCounsellorPerformance />} />
+                    <Route path="/admin/emailtemplate" element={<AdminEmail />} />
+                    <Route path="/admin/sendemail" element={<AdminSendEmail />} />
                 </Route>
 
                 <Route
@@ -103,9 +107,9 @@ const AppRoute = () => {
                 >
                     <Route
                         path="/counsellor"
-                        element={<Navigate to="/counsellor/dashboard" replace />}
+                        element={<Navigate to="/counsellor/leads" replace />}
                     />
-                    <Route path="/counsellor/dashboard" element={<CounsellorDashboard />} />
+                    {/* <Route path="/counsellor/dashboard" element={<CounsellorDashboard />} /> */}
                     <Route path="/counsellor/addlead" element={<CounsellorAddLead />} />
                     <Route path="/counsellor/editlead/:id" element={<CounsellorEditLead />} />
                     <Route path="/counsellor/leads/edit/:id" element={<CounsellorEditLead />} />

@@ -683,7 +683,7 @@ function AdminAddStudent() {
                       required
                       value={formData.age}
                       onChange={handleChange}
-                      placeholder="e.g. 32"
+                      placeholder="e.g. 28"
                       className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pr-4 pl-10 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                     />
                   </div>
@@ -869,8 +869,8 @@ function AdminAddStudent() {
                           key={course._id}
                           onClick={() => toggleCourse(course._id)}
                           className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-all ${isSelected
-                              ? "border-blue-600 bg-blue-50/70 shadow-xs ring-2 ring-blue-500/20"
-                              : "border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100/60"
+                            ? "border-blue-600 bg-blue-50/70 shadow-xs ring-2 ring-blue-500/20"
+                            : "border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100/60"
                             }`}
                         >
                           <div className="mt-0.5 shrink-0 text-blue-600">
@@ -1141,10 +1141,10 @@ function AdminAddStudent() {
                   </div>
                   <p className="mt-1 text-xs text-slate-500">
                     Upload verification documents (e.g. Aadhar card, Voter card,
-                    certificates). Endpoint:{" "}
-                    <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-blue-700">
+                    certificates).<span className="text-red-500 font-semibold"> File limit is 200 kb</span>
+                    {/* <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-blue-700">
                       /api/students/&#123;id&#125;/documents
-                    </code>
+                    </code> */}
                   </p>
                 </div>
 
@@ -1454,10 +1454,10 @@ function AdminAddStudent() {
               </Link>
 
               <Link
-                to="/admin/dashboard"
+                to="/admin/leads"
                 className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl border border-transparent px-6 py-3 text-sm font-semibold text-slate-500 hover:text-slate-800 transition"
               >
-                Go to Dashboard
+                Go to Leads
               </Link>
             </div>
           </div>

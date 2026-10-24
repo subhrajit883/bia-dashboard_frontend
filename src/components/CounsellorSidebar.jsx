@@ -21,12 +21,12 @@ import { PiStudentBold } from "react-icons/pi";
 import { Mail, Send } from "lucide-react";
 
 const NAV_ITEMS = [
-    { label: "Dashboard", icon: FiLayout, to: "/counsellor/dashboard" },
+    // { label: "Dashboard", icon: FiLayout, to: "/counsellor/dashboard" },
     { label: "Add Lead", icon: AiOutlineUserAdd, to: "/counsellor/addlead" },
     { label: "All Leads", icon: FiUsers, to: "/counsellor/leads" },
     { label: "Add Student", icon: FaUserPlus, to: "/counsellor/addstudent" },
     { label: "All Students", icon: PiStudentBold, to: "/counsellor/students" },
-    { label: "Emails Template", icon: Mail, to: "/counsellor/emailtemplate" },
+    { label: "Email Template", icon: Mail, to: "/counsellor/emailtemplate" },
     { label: "Send Emails", icon: Send, to: "/counsellor/emails" },
     // { label: "Settings", icon: FiSettings, to: "/admin/settings" },
 ];
@@ -49,7 +49,7 @@ const CounsellorSidebar = () => {
             {isOpen && (
                 <div
                     onClick={closeSidebar}
-                    className="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-[2px] md:hidden"
+                    className="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-[2px] md:hidden print:hidden"
                 />
             )}
 
@@ -66,6 +66,7 @@ const CounsellorSidebar = () => {
                     text-slate-200
                     shrink-0
                     shadow-2xl md:shadow-none
+                    print:hidden
 
                     transform
                     transition-transform

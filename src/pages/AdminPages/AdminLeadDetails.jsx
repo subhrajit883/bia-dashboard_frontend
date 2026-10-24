@@ -4,7 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import {
     ArrowLeft, Phone, Mail, Calendar, Clock, MapPin, User, UserCheck, BookOpen, Share2, CheckCircle2, AlertCircle, CalendarClock, Copy,
-    Check, Sparkles, MessageSquare, RefreshCw, UserPlus, ChevronRight, PhoneCall, Search, History, FileText, Send, Bell, SquarePen,
+    Check, Sparkles, RefreshCw, UserPlus, ChevronRight, PhoneCall, Search, History, FileText, Send, Bell, SquarePen,
 } from "lucide-react";
 import { leadUrl } from "../../config/config";
 import { FaWhatsapp } from "react-icons/fa";
@@ -462,10 +462,10 @@ function AdminLeadDetails() {
                     {/* Breadcrumbs */}
                     <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                         <Link
-                            to="/admin/dashboard"
+                            to="/admin/students"
                             className="hover:text-blue-600 transition"
                         >
-                            Dashboard
+                            Student
                         </Link>
                         <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
                         <Link
@@ -550,7 +550,7 @@ function AdminLeadDetails() {
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
                             {/* Avatar */}
                             <div className="relative">
-                                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-600 text-2xl font-black tracking-wider text-white shadow-lg shadow-indigo-500/20">
+                                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-blue-600 to-blue-700 text-2xl font-black tracking-wider text-white shadow-lg shadow-indigo-500/20">
                                     {getInitials(lead.name)}
                                 </div>
                                 {lead.isActive && (
@@ -595,7 +595,7 @@ function AdminLeadDetails() {
 
                                 {/* ID and Registration Date */}
                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
-                                    <div className="flex items-center gap-1.5">
+                                    {/* <div className="flex items-center gap-1.5">
                                         <span className="font-semibold text-slate-400">ID:</span>
                                         <span className="font-mono font-medium text-slate-700">
                                             {lead._id}
@@ -612,7 +612,7 @@ function AdminLeadDetails() {
                                                 <Copy className="h-3.5 w-3.5" />
                                             )}
                                         </button>
-                                    </div>
+                                    </div> */}
 
                                     <div className="flex items-center gap-1.5">
                                         <Calendar className="h-3.5 w-3.5 text-slate-400" />
@@ -706,7 +706,7 @@ function AdminLeadDetails() {
                                 ? "bg-rose-50 text-rose-600"
                                 : nextUpcomingCall?.isToday
                                     ? "bg-amber-50 text-amber-600"
-                                    : "bg-indigo-50 text-indigo-600"
+                                    : "bg-indigo-50 text-blue-600"
                                 }`}>
                                 <CalendarClock className="h-4 w-4" />
                             </div>
@@ -973,14 +973,14 @@ function AdminLeadDetails() {
                         <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-2xs">
                             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                                 <div className="flex items-center gap-2">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-violet-50 text-blue-600">
                                         <BookOpen className="h-4 w-4" />
                                     </div>
                                     <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800">
                                         Course Interests
                                     </h2>
                                 </div>
-                                <span className="rounded-md bg-violet-50 border border-violet-100 px-2 py-0.5 text-[10px] font-bold uppercase text-violet-700">
+                                <span className="rounded-md bg-violet-50 border border-violet-100 px-2 py-0.5 text-[10px] font-bold uppercase text-blue-700">
                                     {coursesList.length} Selected
                                 </span>
                             </div>
@@ -994,10 +994,10 @@ function AdminLeadDetails() {
                                         return (
                                             <div
                                                 key={course._id || idx}
-                                                className="flex items-center justify-between rounded-2xl border border-violet-100 bg-violet-50/40 p-3.5 transition hover:bg-violet-50/70"
+                                                className="flex items-center justify-between rounded-2xl border border-violet-100 bg-violet-50/40 p-3.5 transition hover:bg-blue-50/70"
                                             >
                                                 <div className="flex items-center gap-3">
-                                                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-600 text-white font-bold text-xs shadow-2xs">
+                                                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-xs shadow-2xs">
                                                         {idx + 1}
                                                     </div>
                                                     <div>
@@ -1153,7 +1153,7 @@ function AdminLeadDetails() {
                     </div>
 
                     {/* RIGHT COLUMN: Follow-up Engine & Activity Timeline (7 of 12) */}
-                    <div className="lg:col-span-7 space-y-6">
+                    <div className="lg:col-span-7 space-y-6 min-w-0">
                         {/* ========================================================================= */}
                         {/* SECTION A: INLINE ADD FOLLOW-UP INTERACTIVE PANEL */}
                         {/* ========================================================================= */}
@@ -1318,7 +1318,7 @@ function AdminLeadDetails() {
                         {/* ========================================================================= */}
                         {/* SECTION B: ACTIVITY TIMELINE (FOLLOW-UP REMARKS) */}
                         {/* ========================================================================= */}
-                        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-2xs sm:p-7">
+                        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-2xs sm:p-7 min-w-0">
                             {/* Timeline Header with Search */}
                             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4">
                                 <div className="flex items-center gap-2.5">
@@ -1369,13 +1369,13 @@ function AdminLeadDetails() {
                                         No remarks match "{remarkSearch}".
                                     </div>
                                 ) : (
-                                    <div className="relative border-l-2 border-slate-200/80 pl-6 ml-3 space-y-6">
+                                    <div className="relative border-l-2 border-slate-200/80 pl-6 ml-3 space-y-6 min-w-0">
                                         {filteredRemarks.map((remark, idx) => {
                                             const callerName = remark.calledBy?.name || "Staff";
                                             return (
                                                 <div
                                                     key={remark._id || idx}
-                                                    className="group relative"
+                                                    className="group relative min-w-0"
                                                 >
                                                     {/* Timeline Node Point */}
                                                     <span className="absolute -left-[31px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-white ring-4 ring-blue-100 border-2 border-blue-600">
@@ -1383,7 +1383,7 @@ function AdminLeadDetails() {
                                                     </span>
 
                                                     {/* Remark Box */}
-                                                    <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4.5 transition hover:border-blue-200 hover:bg-white hover:shadow-xs">
+                                                    <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4.5 transition hover:border-blue-200 hover:bg-white hover:shadow-xs min-w-0 overflow-hidden">
                                                         {/* Top Row: Caller & Timestamps */}
                                                         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                                                             <div className="flex items-center gap-2">
@@ -1403,7 +1403,7 @@ function AdminLeadDetails() {
                                                         </div>
 
                                                         {/* Description Content */}
-                                                        <p className="mt-3 text-xs leading-relaxed text-slate-800 whitespace-pre-line font-medium">
+                                                        <p className="mt-3 text-xs leading-relaxed text-slate-800 whitespace-pre-line font-medium break-words [overflow-wrap:anywhere] [word-break:break-word]">
                                                             {remark.description}
                                                         </p>
 

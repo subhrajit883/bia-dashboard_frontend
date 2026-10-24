@@ -11,12 +11,14 @@ export const adminUrl = {
   courses: `${BASE_URL}/api/courses`,
   counsellors: `${BASE_URL}/api/counsellors/all`,
   counsellorStatus: (counsellorId) => `${BASE_URL}/api/admin/counsellors/${counsellorId}/status`,
+  deleteCounsellor: (counsellorId) => `${BASE_URL}/api/counsellors/${counsellorId}`,
   students: `${BASE_URL}/api/students`,
 };
 
 export const counsellorUrl = {
   counsellorAll: `${BASE_URL}/api/counsellors/all`,
   statusUpdate: (counsellorId) => `${BASE_URL}/api/admin/counsellors/${counsellorId}/status`,
+  deleteCounsellor: (counsellorId) => `${BASE_URL}/api/counsellors/${counsellorId}`,
 };
 
 export const courseUrl = {

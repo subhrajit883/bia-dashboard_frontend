@@ -460,10 +460,10 @@ function CounsellorLeadDetails() {
                     {/* Breadcrumbs */}
                     <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                         <Link
-                            to="/counsellor/dashboard"
+                            to="/counsellor/students"
                             className="hover:text-blue-600 transition"
                         >
-                            Dashboard
+                            Students
                         </Link>
                         <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
                         <Link
@@ -1151,7 +1151,7 @@ function CounsellorLeadDetails() {
                     </div>
 
                     {/* RIGHT COLUMN: Follow-up Engine & Activity Timeline (7 of 12) */}
-                    <div className="lg:col-span-7 space-y-6">
+                    <div className="lg:col-span-7 space-y-6 min-w-0">
                         {/* ========================================================================= */}
                         {/* SECTION A: INLINE ADD FOLLOW-UP INTERACTIVE PANEL */}
                         {/* ========================================================================= */}
@@ -1287,7 +1287,7 @@ function CounsellorLeadDetails() {
                         {/* ========================================================================= */}
                         {/* SECTION B: ACTIVITY TIMELINE (FOLLOW-UP REMARKS) */}
                         {/* ========================================================================= */}
-                        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-2xs sm:p-7">
+                        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-2xs sm:p-7 min-w-0">
                             {/* Timeline Header with Search */}
                             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4">
                                 <div className="flex items-center gap-2.5">
@@ -1338,13 +1338,13 @@ function CounsellorLeadDetails() {
                                         No remarks match "{remarkSearch}".
                                     </div>
                                 ) : (
-                                    <div className="relative border-l-2 border-slate-200/80 pl-6 ml-3 space-y-6">
+                                    <div className="relative border-l-2 border-slate-200/80 pl-6 ml-3 space-y-6 min-w-0">
                                         {filteredRemarks.map((remark, idx) => {
                                             const callerName = remark.calledBy?.name || "Staff";
                                             return (
                                                 <div
                                                     key={remark._id || idx}
-                                                    className="group relative"
+                                                    className="group relative min-w-0"
                                                 >
                                                     {/* Timeline Node Point */}
                                                     <span className="absolute -left-[31px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-white ring-4 ring-blue-100 border-2 border-blue-600">
@@ -1352,7 +1352,7 @@ function CounsellorLeadDetails() {
                                                     </span>
 
                                                     {/* Remark Box */}
-                                                    <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4.5 transition hover:border-blue-200 hover:bg-white hover:shadow-xs">
+                                                    <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4.5 transition hover:border-blue-200 hover:bg-white hover:shadow-xs min-w-0 overflow-hidden">
                                                         {/* Top Row: Caller & Timestamps */}
                                                         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                                                             <div className="flex items-center gap-2">
@@ -1372,7 +1372,7 @@ function CounsellorLeadDetails() {
                                                         </div>
 
                                                         {/* Description Content */}
-                                                        <p className="mt-3 text-xs leading-relaxed text-slate-800 whitespace-pre-line font-medium">
+                                                        <p className="mt-3 text-xs leading-relaxed text-slate-800 whitespace-pre-line font-medium break-words [overflow-wrap:anywhere] [word-break:break-word]">
                                                             {remark.description}
                                                         </p>
 

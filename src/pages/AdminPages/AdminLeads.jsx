@@ -25,6 +25,10 @@ import {
     Check,
     Eye,
     SquarePen,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
 } from "lucide-react";
 import {
     leadUrl,
@@ -67,6 +71,11 @@ function AdminLeads() {
     // Query filter states
     const [showFilters, setShowFilters] = useState(false);
     const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalLeadsCount, setTotalLeadsCount] = useState(0);
     const [candidateType, setCandidateType] = useState("");
     const [sourceName, setSourceName] = useState("");
     const [dateFrom, setDateFrom] = useState("");
@@ -133,7 +142,31 @@ function AdminLeads() {
         };
     }, []);
 
-    // Fetch leads with query parameters
+    // Debounce search input by 400ms so API is not hit on every keystroke
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    // Reset to page 1 whenever search query or filters change
+    useEffect(() => {
+        setPage(1);
+    }, [
+        debouncedSearch,
+        candidateType,
+        sourceName,
+        dateFrom,
+        dateTo,
+        courseName,
+        assignedCounsellorName,
+        status,
+        conversionStatus,
+        limit,
+    ]);
+
+    // Fetch leads with query parameters & pagination
     const loadLeads = useCallback(async (showLoading = false) => {
         if (showLoading) setLoading(true);
         try {
@@ -142,8 +175,11 @@ function AdminLeads() {
                 ? { Authorization: `Bearer ${adminToken}` }
                 : {};
 
-            const params = {};
-            if (search.trim()) params.search = search.trim();
+            const params = {
+                page,
+                limit,
+            };
+            if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
             if (candidateType) params.candidateType = candidateType;
             if (sourceName) params.sourceName = sourceName;
             if (dateFrom) params.dateFrom = dateFrom;
@@ -160,15 +196,39 @@ function AdminLeads() {
             });
 
             const result = response.data;
+            let list = [];
+            let total = 0;
+            let calculatedTotalPages = 1;
+
             if (Array.isArray(result)) {
-                setLeads(result);
-            } else if (result?.success && Array.isArray(result.data)) {
-                setLeads(result.data);
+                list = result;
+                total = result.length;
+                calculatedTotalPages = Math.ceil(total / limit) || 1;
             } else if (Array.isArray(result?.data)) {
-                setLeads(result.data);
-            } else {
-                setLeads([]);
+                list = result.data;
+                total = result.total ?? result.totalLeads ?? result.count ?? result.data.length;
+                calculatedTotalPages = result.totalPages ?? result.pages ?? Math.ceil(total / limit) ?? 1;
+            } else if (Array.isArray(result?.leads)) {
+                list = result.leads;
+                total = result.total ?? result.totalLeads ?? result.count ?? result.leads.length;
+                calculatedTotalPages = result.totalPages ?? result.pages ?? Math.ceil(total / limit) ?? 1;
+            } else if (result?.data?.leads && Array.isArray(result.data.leads)) {
+                list = result.data.leads;
+                total = result.data.total ?? result.data.totalLeads ?? result.data.count ?? result.data.leads.length;
+                calculatedTotalPages = result.data.totalPages ?? result.data.pages ?? Math.ceil(total / limit) ?? 1;
+            } else if (result?.pagination) {
+                list = Array.isArray(result.data) ? result.data : (Array.isArray(result.leads) ? result.leads : []);
+                total = result.pagination.total ?? list.length;
+                calculatedTotalPages = result.pagination.totalPages ?? Math.ceil(total / limit) ?? 1;
+            } else if (result && result._id) {
+                list = [result];
+                total = 1;
+                calculatedTotalPages = 1;
             }
+
+            setLeads(list);
+            setTotalLeadsCount(total);
+            setTotalPages(calculatedTotalPages || 1);
         } catch (err) {
             console.error("Fetch leads error:", err.response?.data || err);
             toast.error(
@@ -178,7 +238,7 @@ function AdminLeads() {
             setLoading(false);
         }
     }, [
-        search,
+        debouncedSearch,
         candidateType,
         sourceName,
         dateFrom,
@@ -187,76 +247,19 @@ function AdminLeads() {
         assignedCounsellorName,
         status,
         conversionStatus,
+        page,
+        limit,
     ]);
 
+    // Automatically reload leads whenever query params or page change
     useEffect(() => {
-        let isMounted = true;
-
-        const fetchFilteredLeads = async () => {
-            try {
-                const adminToken = localStorage.getItem("adminToken");
-                const headers = adminToken
-                    ? { Authorization: `Bearer ${adminToken}` }
-                    : {};
-
-                const params = {};
-                if (search.trim()) params.search = search.trim();
-                if (candidateType) params.candidateType = candidateType;
-                if (sourceName) params.sourceName = sourceName;
-                if (dateFrom) params.dateFrom = dateFrom;
-                if (dateTo) params.dateTo = dateTo;
-                if (courseName) params.courseName = courseName;
-                if (assignedCounsellorName)
-                    params.assignedCounsellorName = assignedCounsellorName;
-                if (status) params.status = status;
-                if (conversionStatus) params.conversionStatus = conversionStatus;
-
-                const response = await axios.get(leadUrl.lead, {
-                    params,
-                    headers,
-                });
-
-                const result = response.data;
-                const list = Array.isArray(result)
-                    ? result
-                    : result?.success && Array.isArray(result.data)
-                        ? result.data
-                        : Array.isArray(result?.data)
-                            ? result.data
-                            : [];
-
-                if (isMounted) {
-                    setLeads(list);
-                }
-            } catch (err) {
-                console.error("Fetch leads error:", err);
-            } finally {
-                if (isMounted) {
-                    setLoading(false);
-                }
-            }
-        };
-
-        fetchFilteredLeads();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [
-        search,
-        candidateType,
-        sourceName,
-        dateFrom,
-        dateTo,
-        courseName,
-        assignedCounsellorName,
-        status,
-        conversionStatus,
-    ]);
+        loadLeads(true);
+    }, [loadLeads]);
 
     // Reset all filters
     const handleClearFilters = () => {
         setSearch("");
+        setDebouncedSearch("");
         setCandidateType("");
         setSourceName("");
         setDateFrom("");
@@ -265,6 +268,28 @@ function AdminLeads() {
         setAssignedCounsellorName("");
         setStatus("");
         setConversionStatus("");
+        setPage(1);
+    };
+
+    // Calculate smart array of visible page numbers for pagination controls
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisiblePages = 5;
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            let start = Math.max(1, page - 2);
+            let end = Math.min(totalPages, start + maxVisiblePages - 1);
+            if (end - start < maxVisiblePages - 1) {
+                start = Math.max(1, end - maxVisiblePages + 1);
+            }
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+        }
+        return pages;
     };
 
     // Open Follow-up Modal
@@ -389,7 +414,7 @@ function AdminLeads() {
 
     // Stats calculation
     const stats = useMemo(() => {
-        const total = leads.length;
+        const total = totalLeadsCount > 0 ? totalLeadsCount : leads.length;
         const interested = leads.filter(
             (l) => l.candidateStatus === "interested"
         ).length;
@@ -402,7 +427,13 @@ function AdminLeads() {
                 Boolean(l.convertedStudent)
         ).length;
         return { total, interested, ongoing, converted };
-    }, [leads]);
+    }, [leads, totalLeadsCount]);
+
+    const startLeadIndex = totalLeadsCount === 0 ? 0 : (page - 1) * limit + 1;
+    const endLeadIndex = Math.min(
+        page * limit,
+        totalLeadsCount > 0 ? totalLeadsCount : (page - 1) * limit + leads.length
+    );
 
     // Active filters count
     const activeFiltersCount = useMemo(() => {
@@ -470,7 +501,7 @@ function AdminLeads() {
                     <div className="flex flex-wrap items-center gap-3">
                         <button
                             type="button"
-                            onClick={loadLeads}
+                            onClick={() => loadLeads(true)}
                             disabled={loading}
                             className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 disabled:opacity-60"
                         >
@@ -508,20 +539,20 @@ function AdminLeads() {
                         </p>
                     </div>
 
-                    <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-4 shadow-xs">
-                        <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
+                    <div className="rounded-2xl border border-amber-100 bg-amber-50/50 p-4 shadow-xs">
+                        <p className="text-xs font-bold uppercase tracking-wider text-amber-600">
                             Ongoing
                         </p>
-                        <p className="mt-1 text-2xl font-extrabold text-blue-700">
+                        <p className="mt-1 text-2xl font-extrabold text-amber-700">
                             {stats.ongoing}
                         </p>
                     </div>
 
-                    <div className="rounded-2xl border border-purple-100 bg-purple-50/50 p-4 shadow-xs">
-                        <p className="text-xs font-bold uppercase tracking-wider text-purple-600">
+                    <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-4 shadow-xs">
+                        <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
                             Converted
                         </p>
-                        <p className="mt-1 text-2xl font-extrabold text-purple-700">
+                        <p className="mt-1 text-2xl font-extrabold text-blue-700">
                             {stats.converted}
                         </p>
                     </div>
@@ -537,9 +568,28 @@ function AdminLeads() {
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search by name, phone, or email (search)..."
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pr-4 pl-10 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        setDebouncedSearch(search);
+                                    }
+                                }}
+                                placeholder="Search by name, phone, or email..."
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pr-10 pl-10 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                             />
+                            {search && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSearch("");
+                                        setDebouncedSearch("");
+                                        setPage(1);
+                                    }}
+                                    className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer rounded-md p-1 text-slate-400 transition hover:bg-slate-200 hover:text-slate-600"
+                                    title="Clear search"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+                            )}
                         </div>
 
                         {/* Filter Toggle & Quick Actions */}
@@ -959,6 +1009,110 @@ function AdminLeads() {
                                     })}
                                 </tbody>
                             </table>
+                        </div>
+                    )}
+
+                    {/* Pagination Footer (Query Params: page, limit) */}
+                    {leads.length > 0 && (
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t border-slate-200 bg-slate-50/80 px-5 py-3.5 text-xs text-slate-600">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <div>
+                                    Showing{" "}
+                                    <span className="font-bold text-slate-900">
+                                        {startLeadIndex}
+                                    </span>{" "}
+                                    to{" "}
+                                    <span className="font-bold text-slate-900">
+                                        {endLeadIndex}
+                                    </span>{" "}
+                                    of{" "}
+                                    <span className="font-bold text-slate-900">
+                                        {totalLeadsCount > 0 ? totalLeadsCount : leads.length}
+                                    </span>{" "}
+                                    leads
+                                    {" "}• Page <span className="font-bold text-slate-900">{page}</span> of{" "}
+                                    <span className="font-bold text-slate-900">{Math.max(totalPages, 1)}</span>
+                                </div>
+
+                                {/* Rows per page dropdown */}
+                                <div className="flex items-center gap-1.5 ml-0 sm:ml-2">
+                                    <span className="text-slate-500">Per page:</span>
+                                    <select
+                                        value={limit}
+                                        onChange={(e) => {
+                                            setLimit(Number(e.target.value));
+                                            setPage(1);
+                                        }}
+                                        className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 cursor-pointer"
+                                    >
+                                        <option value={10}>10</option>
+                                        <option value={20}>20</option>
+                                        <option value={50}>50</option>
+                                        <option value={100}>100</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Page Buttons */}
+                            <div className="flex items-center gap-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setPage(1)}
+                                    disabled={page <= 1 || loading}
+                                    title="First Page"
+                                    className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronsLeft className="h-4 w-4" />
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                                    disabled={page <= 1 || loading}
+                                    className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronLeft className="h-3.5 w-3.5" />
+                                    <span className="hidden sm:inline">Prev</span>
+                                </button>
+
+                                <div className="flex items-center gap-1">
+                                    {getPageNumbers().map((p) => (
+                                        <button
+                                            key={p}
+                                            type="button"
+                                            onClick={() => setPage(p)}
+                                            disabled={loading}
+                                            className={`h-7 min-w-7 cursor-pointer rounded-lg px-2 text-xs font-bold transition ${
+                                                p === page
+                                                    ? "bg-blue-600 text-white shadow-xs"
+                                                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+                                            }`}
+                                        >
+                                            {p}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                                    disabled={page >= totalPages || loading}
+                                    className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    <span className="hidden sm:inline">Next</span>
+                                    <ChevronRight className="h-3.5 w-3.5" />
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setPage(totalPages)}
+                                    disabled={page >= totalPages || loading}
+                                    title="Last Page"
+                                    className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronsRight className="h-4 w-4" />
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>

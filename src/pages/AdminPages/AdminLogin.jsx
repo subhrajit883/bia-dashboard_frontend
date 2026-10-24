@@ -20,7 +20,7 @@ function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -55,12 +55,12 @@ function AdminLogin() {
       }
 
       toast.success(message || "Login successful!");
-      navigate("/admin/dashboard", { replace: true });
+      navigate("/admin/leads", { replace: true });
     } catch (err) {
       console.error("Admin login error:", err.response?.data || err);
       toast.error(
         err.response?.data?.message ||
-          "Invalid credentials or server error."
+        "Invalid credentials or server error."
       );
     } finally {
       setLoading(false);
@@ -69,7 +69,7 @@ function AdminLogin() {
 
   useEffect(() => {
     if (localStorage.getItem("adminToken")) {
-      navigate("/admin/dashboard", { replace: true });
+      navigate("/admin/leads", { replace: true });
     }
   }, [navigate]);
 
@@ -125,7 +125,7 @@ function AdminLogin() {
 
         <div className="flex items-center justify-center px-6 py-10 sm:px-10 md:px-12 lg:px-14">
           <div className="w-full max-w-md">
-            <div className="mb-9 flex justify-center md:hidden">
+            <div className="mb-9 flex justify-center md:hidden ">
               <img
                 src={logo}
                 alt="Bi Talents Logo"

@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import {
     Users, Search, Filter, RefreshCw, Plus, Phone, Mail, Calendar, BookOpen, UserCheck, X,
     RotateCcw, Sparkles, ChevronDown, ChevronUp, Check, Copy, IndianRupee, FileText,
-    Eye, ExternalLink, MapPin, ChevronLeft, ChevronRight, PhoneCall, ShieldCheck,
+    Eye, ExternalLink, MapPin, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, PhoneCall, ShieldCheck,
     CreditCard,
     SquarePen,
 } from "lucide-react";
@@ -13,6 +13,7 @@ import {
     studentUrl,
     courseUrl,
     counsellorUrl,
+    adminUrl,
 } from "../../config/config";
 
 const PAYMENT_STATUSES = [
@@ -35,6 +36,7 @@ function AdminStudents() {
     // Query filter states (Matching all 10 query params from Postman)
     const [showFilters, setShowFilters] = useState(false);
     const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [sId, setSId] = useState("");
     const [paymentStatus, setPaymentStatus] = useState("");
     const [assignedCounsellorName, setAssignedCounsellorName] = useState("");
@@ -85,15 +87,27 @@ function AdminStudents() {
         };
     }, []);
 
-    // Load students with all 10 query params
+    // Debounce search input by 400ms so API is not hit on every keystroke
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+            setPage(1);
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    // Load students with all query params and backend pagination
     const loadStudents = useCallback(async (showLoading = false) => {
         if (showLoading) setLoading(true);
         try {
             const adminToken = localStorage.getItem("adminToken");
             const headers = adminToken ? { Authorization: `Bearer ${adminToken}` } : {};
 
-            const params = {};
-            if (search.trim()) params.search = search.trim();
+            const params = {
+                page,
+                limit,
+            };
+            if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
             if (sId.trim()) params.s_id = sId.trim();
             if (paymentStatus) params.paymentStatus = paymentStatus;
             if (assignedCounsellorName) params.assignedCounsellorName = assignedCounsellorName;
@@ -101,13 +115,19 @@ function AdminStudents() {
             if (admissionTo) params.admissionTo = admissionTo;
             if (courseName) params.courseName = courseName;
             if (isActive !== "") params.isActive = isActive;
-            if (page) params.page = page;
-            if (limit) params.limit = limit;
 
-            const targetUrl = studentUrl?.students;
+            const targetUrl = studentUrl?.students || adminUrl?.students;
             let response;
-            response = await axios.get(targetUrl, { params, headers });
-            console.log(response.data);
+            try {
+                response = await axios.get(targetUrl, { params, headers });
+            } catch (err) {
+                if (err.response?.status === 404 && adminUrl?.students && targetUrl !== adminUrl.students) {
+                    response = await axios.get(adminUrl.students, { params, headers });
+                } else {
+                    throw err;
+                }
+            }
+
             const result = response.data;
             let list = [];
             let total = 0;
@@ -116,26 +136,32 @@ function AdminStudents() {
             if (Array.isArray(result)) {
                 list = result;
                 total = result.length;
+                calculatedTotalPages = Math.ceil(total / limit) || 1;
             } else if (Array.isArray(result?.data)) {
                 list = result.data;
-                total = result.total || result.data.length;
-                calculatedTotalPages = result.totalPages || Math.ceil(total / limit) || 1;
+                total = result.total ?? result.totalStudents ?? result.count ?? result.data.length;
+                calculatedTotalPages = result.totalPages ?? result.pages ?? Math.ceil(total / limit) ?? 1;
             } else if (Array.isArray(result?.students)) {
                 list = result.students;
-                total = result.total || result.students.length;
-                calculatedTotalPages = result.totalPages || Math.ceil(total / limit) || 1;
+                total = result.total ?? result.totalStudents ?? result.count ?? result.students.length;
+                calculatedTotalPages = result.totalPages ?? result.pages ?? Math.ceil(total / limit) ?? 1;
             } else if (result?.data?.students && Array.isArray(result.data.students)) {
                 list = result.data.students;
-                total = result.data.total || result.data.students.length;
-                calculatedTotalPages = result.data.totalPages || Math.ceil(total / limit) || 1;
+                total = result.data.total ?? result.data.totalStudents ?? result.data.count ?? result.data.students.length;
+                calculatedTotalPages = result.data.totalPages ?? result.data.pages ?? Math.ceil(total / limit) ?? 1;
+            } else if (result?.pagination) {
+                list = Array.isArray(result.data) ? result.data : (Array.isArray(result.students) ? result.students : []);
+                total = result.pagination.total ?? list.length;
+                calculatedTotalPages = result.pagination.totalPages ?? Math.ceil(total / limit) ?? 1;
             } else if (result && result._id) {
                 list = [result];
                 total = 1;
+                calculatedTotalPages = 1;
             }
 
             setStudents(list);
             setTotalStudentsCount(total);
-            setTotalPages(calculatedTotalPages);
+            setTotalPages(calculatedTotalPages || 1);
         } catch (err) {
             console.error("Fetch students error:", err.response?.data || err);
             toast.error(
@@ -146,7 +172,7 @@ function AdminStudents() {
             setLoading(false);
         }
     }, [
-        search,
+        debouncedSearch,
         sId,
         paymentStatus,
         assignedCounsellorName,
@@ -158,100 +184,16 @@ function AdminStudents() {
         limit,
     ]);
 
-    // Re-fetch whenever query params change
+    // Automatically reload students whenever query params or page change
     useEffect(() => {
-        let isMounted = true;
-
-        const fetchFiltered = async () => {
-            setLoading(true);
-            try {
-                const adminToken = localStorage.getItem("adminToken");
-                const headers = adminToken ? { Authorization: `Bearer ${adminToken}` } : {};
-
-                const params = {};
-                if (search.trim()) params.search = search.trim();
-                if (sId.trim()) params.s_id = sId.trim();
-                if (paymentStatus) params.paymentStatus = paymentStatus;
-                if (assignedCounsellorName) params.assignedCounsellorName = assignedCounsellorName;
-                if (admissionFrom) params.admissionFrom = admissionFrom;
-                if (admissionTo) params.admissionTo = admissionTo;
-                if (courseName) params.courseName = courseName;
-                if (isActive !== "") params.isActive = isActive;
-                if (page) params.page = page;
-                if (limit) params.limit = limit;
-
-                const targetUrl = studentUrl?.students;
-                let response;
-                try {
-                    response = await axios.get(targetUrl, { params, headers });
-                } catch (err) {
-                    if (err.response?.status === 404 && adminUrl?.students && targetUrl !== adminUrl.students) {
-                        response = await axios.get(adminUrl.students, { params, headers });
-                    } else {
-                        throw err;
-                    }
-                }
-
-                const result = response.data;
-                let list = [];
-                let total = 0;
-                let calculatedTotalPages = 1;
-
-                if (Array.isArray(result)) {
-                    list = result;
-                    total = result.length;
-                } else if (Array.isArray(result?.data)) {
-                    list = result.data;
-                    total = result.total || result.data.length;
-                    calculatedTotalPages = result.totalPages || Math.ceil(total / limit) || 1;
-                } else if (Array.isArray(result?.students)) {
-                    list = result.students;
-                    total = result.total || result.students.length;
-                    calculatedTotalPages = result.totalPages || Math.ceil(total / limit) || 1;
-                } else if (result?.data?.students && Array.isArray(result.data.students)) {
-                    list = result.data.students;
-                    total = result.data.total || result.data.students.length;
-                    calculatedTotalPages = result.data.totalPages || Math.ceil(total / limit) || 1;
-                } else if (result && result._id) {
-                    list = [result];
-                    total = 1;
-                }
-
-                if (isMounted) {
-                    setStudents(list);
-                    setTotalStudentsCount(total);
-                    setTotalPages(calculatedTotalPages);
-                }
-            } catch (err) {
-                console.error("Fetch students error:", err);
-            } finally {
-                if (isMounted) {
-                    setLoading(false);
-                }
-            }
-        };
-
-        fetchFiltered();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [
-        search,
-        sId,
-        paymentStatus,
-        assignedCounsellorName,
-        admissionFrom,
-        admissionTo,
-        courseName,
-        isActive,
-        page,
-        limit,
-    ]);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadStudents(true);
+    }, [loadStudents]);
 
     // Reset all filters
     const handleClearFilters = () => {
         setSearch("");
+        setDebouncedSearch("");
         setSId("");
         setPaymentStatus("");
         setAssignedCounsellorName("");
@@ -260,6 +202,27 @@ function AdminStudents() {
         setCourseName("");
         setIsActive("");
         setPage(1);
+    };
+
+    // Calculate smart array of visible page numbers for pagination controls
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisiblePages = 5;
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            let start = Math.max(1, page - 2);
+            let end = Math.min(totalPages, start + maxVisiblePages - 1);
+            if (end - start < maxVisiblePages - 1) {
+                start = Math.max(1, end - maxVisiblePages + 1);
+            }
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+        }
+        return pages;
     };
 
     // Calculate active filters count
@@ -305,6 +268,12 @@ function AdminStudents() {
             totalRevenue,
         };
     }, [students, totalStudentsCount]);
+
+    const startStudentIndex = totalStudentsCount === 0 ? 0 : (page - 1) * limit + 1;
+    const endStudentIndex = Math.min(
+        page * limit,
+        totalStudentsCount > 0 ? totalStudentsCount : (page - 1) * limit + students.length
+    );
 
     // Copy to clipboard helper
     const handleCopy = (text, fieldName) => {
@@ -398,7 +367,7 @@ function AdminStudents() {
                 {/* ========================================================================= */}
                 {/* 2. STATS SUMMARY CARDS */}
                 {/* ========================================================================= */}
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {/* <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs">
                         <div className="flex items-center justify-between">
                             <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -466,7 +435,7 @@ function AdminStudents() {
                             Across loaded students
                         </p>
                     </div>
-                </div>
+                </div> */}
 
                 {/* ========================================================================= */}
                 {/* 3. SEARCH & ADVANCED FILTERS TOOLBAR (10 PARAMS) */}
@@ -479,13 +448,29 @@ function AdminStudents() {
                             <input
                                 type="text"
                                 value={search}
-                                onChange={(e) => {
-                                    setSearch(e.target.value);
-                                    setPage(1);
+                                onChange={(e) => setSearch(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        setDebouncedSearch(search);
+                                    }
                                 }}
-                                placeholder="Search student by name, phone, email, address (search)..."
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pr-4 pl-10 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
+                                placeholder="Search student by name, phone, email, address..."
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pr-10 pl-10 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
                             />
+                            {search && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSearch("");
+                                        setDebouncedSearch("");
+                                        setPage(1);
+                                    }}
+                                    className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer rounded-md p-1 text-slate-400 transition hover:bg-slate-200 hover:text-slate-600"
+                                    title="Clear search"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+                            )}
                         </div>
 
                         {/* Filter Toggle & Clear Filters */}
@@ -942,38 +927,107 @@ function AdminStudents() {
                     )}
 
                     {/* Pagination Footer (Query Params: page, limit) */}
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-slate-200 bg-slate-50/80 px-5 py-3 text-xs text-slate-600">
-                        <div>
-                            Showing <span className="font-bold text-slate-900">{students.length}</span> students
-                            {totalStudentsCount > 0 && (
-                                <> of <span className="font-bold text-slate-900">{totalStudentsCount}</span> total</>
-                            )}
-                            {" "}• Page <span className="font-bold text-slate-900">{page}</span> of{" "}
-                            <span className="font-bold text-slate-900">{totalPages}</span>
-                        </div>
+                    {students.length > 0 && (
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t border-slate-200 bg-slate-50/80 px-5 py-3.5 text-xs text-slate-600">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <div>
+                                    Showing{" "}
+                                    <span className="font-bold text-slate-900">
+                                        {startStudentIndex}
+                                    </span>{" "}
+                                    to{" "}
+                                    <span className="font-bold text-slate-900">
+                                        {endStudentIndex}
+                                    </span>{" "}
+                                    of{" "}
+                                    <span className="font-bold text-slate-900">
+                                        {totalStudentsCount > 0 ? totalStudentsCount : students.length}
+                                    </span>{" "}
+                                    students
+                                    {" "}• Page <span className="font-bold text-slate-900">{page}</span> of{" "}
+                                    <span className="font-bold text-slate-900">{Math.max(totalPages, 1)}</span>
+                                </div>
 
-                        <div className="flex items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                                disabled={page <= 1 || loading}
-                                className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-40"
-                            >
-                                <ChevronLeft className="h-3.5 w-3.5" />
-                                Previous
-                            </button>
+                                {/* Rows per page dropdown */}
+                                <div className="flex items-center gap-1.5 ml-0 sm:ml-2">
+                                    <span className="text-slate-500">Per page:</span>
+                                    <select
+                                        value={limit}
+                                        onChange={(e) => {
+                                            setLimit(Number(e.target.value));
+                                            setPage(1);
+                                        }}
+                                        className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 cursor-pointer"
+                                    >
+                                        <option value={10}>10</option>
+                                        <option value={20}>20</option>
+                                        <option value={50}>50</option>
+                                        <option value={100}>100</option>
+                                    </select>
+                                </div>
+                            </div>
 
-                            <button
-                                type="button"
-                                onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                                disabled={page >= totalPages || loading}
-                                className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-40"
-                            >
-                                Next
-                                <ChevronRight className="h-3.5 w-3.5" />
-                            </button>
+                            {/* Page Buttons */}
+                            <div className="flex items-center gap-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setPage(1)}
+                                    disabled={page <= 1 || loading}
+                                    title="First Page"
+                                    className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronsLeft className="h-4 w-4" />
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                                    disabled={page <= 1 || loading}
+                                    className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronLeft className="h-3.5 w-3.5" />
+                                    <span className="hidden sm:inline">Prev</span>
+                                </button>
+
+                                <div className="flex items-center gap-1">
+                                    {getPageNumbers().map((p) => (
+                                        <button
+                                            key={p}
+                                            type="button"
+                                            onClick={() => setPage(p)}
+                                            disabled={loading}
+                                            className={`h-7 min-w-7 cursor-pointer rounded-lg px-2 text-xs font-bold transition ${p === page
+                                                    ? "bg-emerald-600 text-white shadow-xs"
+                                                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+                                                }`}
+                                        >
+                                            {p}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                                    disabled={page >= totalPages || loading}
+                                    className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    <span className="hidden sm:inline">Next</span>
+                                    <ChevronRight className="h-3.5 w-3.5" />
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setPage(totalPages)}
+                                    disabled={page >= totalPages || loading}
+                                    title="Last Page"
+                                    className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronsRight className="h-4 w-4" />
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* ========================================================================= */}

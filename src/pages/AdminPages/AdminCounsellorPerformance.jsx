@@ -23,6 +23,9 @@ import {
     Percent,
     PieChart as PieChartIcon,
     Target,
+    LayoutGrid,
+    Table as TableIcon,
+    Award,
 } from "lucide-react";
 import {
     counsellorPerformanceUrl,
@@ -118,9 +121,9 @@ function SvgDonutChart({ data = [], size = 200, innerRadius = 60, title = "Total
     const hoveredItem = hoveredIndex !== null ? slices[hoveredIndex] : null;
 
     return (
-        <div className="flex flex-col sm:flex-row items-center gap-6 justify-center">
+        <div className="flex flex-col sm:flex-row items-center gap-6 justify-center print:flex-col print:items-center print:gap-2">
             {/* SVG Donut */}
-            <div className="relative shrink-0" style={{ width: size, height: size }}>
+            <div className="relative shrink-0 print:scale-85" style={{ width: size, height: size }}>
                 <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
                     {slices.map((slice, idx) => (
                         <path
@@ -140,10 +143,10 @@ function SvgDonutChart({ data = [], size = 200, innerRadius = 60, title = "Total
 
                 {/* Center metric indicator */}
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <span className="text-xl font-black text-slate-900">
+                    <span className="text-xl font-black text-slate-900 print:text-lg">
                         {hoveredItem ? hoveredItem.value : total}
                     </span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 max-w-[80px] truncate">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 max-w-[80px] truncate print:text-[9px]">
                         {hoveredItem ? hoveredItem.label : title}
                     </span>
                     {hoveredItem && (
@@ -155,24 +158,23 @@ function SvgDonutChart({ data = [], size = 200, innerRadius = 60, title = "Total
             </div>
 
             {/* Interactive Legend */}
-            <div className="flex flex-col gap-2 max-w-xs text-xs">
+            <div className="flex flex-col gap-2 max-w-xs text-xs print:w-full print:gap-1 print:text-[10px]">
                 {slices.map((slice, idx) => (
                     <div
                         key={idx}
                         onMouseEnter={() => setHoveredIndex(idx)}
                         onMouseLeave={() => setHoveredIndex(null)}
-                        className={`flex items-center justify-between gap-3 rounded-lg px-2.5 py-1.5 transition cursor-pointer ${
-                            hoveredIndex === idx ? "bg-slate-100 font-bold" : "hover:bg-slate-50"
-                        }`}
+                        className={`flex items-center justify-between gap-3 rounded-lg px-2.5 py-1.5 transition cursor-pointer print:px-1.5 print:py-0.5 print:gap-1.5 ${hoveredIndex === idx ? "bg-slate-100 font-bold" : "hover:bg-slate-50"
+                            }`}
                     >
                         <div className="flex items-center gap-2 truncate">
                             <span
-                                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                                className="h-2.5 w-2.5 shrink-0 rounded-full print:h-2 print:w-2"
                                 style={{ backgroundColor: slice.color || CHART_PALETTE[idx % CHART_PALETTE.length] }}
                             />
                             <span className="truncate capitalize text-slate-700">{slice.label}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 shrink-0 font-mono text-[11px]">
+                        <div className="flex items-center gap-1.5 shrink-0 font-mono text-[11px] print:text-[10px]">
                             <span className="font-bold text-slate-900">{slice.value}</span>
                             <span className="text-slate-400">({slice.percentage}%)</span>
                         </div>
@@ -186,6 +188,8 @@ function SvgDonutChart({ data = [], size = 200, innerRadius = 60, title = "Total
 function AdminCounsellorPerformance() {
     // Active View Mode: 'performance' (Overview) | 'report' (Analytics, Charts & Export)
     const [activeTab, setActiveTab] = useState("performance");
+    // Executive Report Presentation Mode on screen: 'cards' (Responsive Non-Table) | 'table'
+    const [executiveViewMode, setExecutiveViewMode] = useState("cards");
 
     // Loading states
     const [loading, setLoading] = useState(true);
@@ -228,13 +232,13 @@ function AdminCounsellorPerformance() {
                     const cList = Array.isArray(cnlRes.data?.data)
                         ? cnlRes.data.data
                         : Array.isArray(cnlRes.data)
-                        ? cnlRes.data
-                        : [];
+                            ? cnlRes.data
+                            : [];
                     const crsData = Array.isArray(crsRes.data?.data)
                         ? crsRes.data.data
                         : Array.isArray(crsRes.data)
-                        ? crsRes.data
-                        : [];
+                            ? crsRes.data
+                            : [];
 
                     setCounsellorsList(cList);
                     setCoursesList(crsData);
@@ -318,6 +322,7 @@ function AdminCounsellorPerformance() {
 
     // Initial and param change trigger
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchData();
     }, [fetchData]);
 
@@ -514,9 +519,44 @@ function AdminCounsellorPerformance() {
             .filter((i) => i.value > 0);
     }, [performanceList]);
 
+    // Consolidated dataset for Executive Reports & Charts
+    const executiveReportData = useMemo(() => {
+        return reportList.length > 0 ? reportList : performanceList;
+    }, [reportList, performanceList]);
+
+    // Aggregate metrics across reporting counsellors for Executive KPI banner
+    const executiveTotals = useMemo(() => {
+        return executiveReportData.reduce(
+            (acc, item) => {
+                const tot = item.totalLeads ?? item.totalCandidates ?? 0;
+                const conv = item.converted ?? item.conversionMetrics?.converted ?? 0;
+                const cls = item.closed ?? item.statusBreakdown?.closed ?? 0;
+                const ong = item.ongoing ?? item.statusBreakdown?.ongoing ?? 0;
+                const int = item.interested ?? item.statusBreakdown?.interested ?? 0;
+                const fol = item.followUps ?? item.totalFollowUps ?? 0;
+                const pen = item.pendingApproval ?? item.conversionMetrics?.pendingConversion ?? 0;
+
+                acc.total += tot;
+                acc.converted += conv;
+                acc.closed += cls;
+                acc.ongoing += ong;
+                acc.interested += int;
+                acc.followUps += fol;
+                acc.pending += pen;
+                return acc;
+            },
+            { total: 0, converted: 0, closed: 0, ongoing: 0, interested: 0, followUps: 0, pending: 0 }
+        );
+    }, [executiveReportData]);
+
+    const executiveOverallRate =
+        executiveTotals.total > 0
+            ? ((executiveTotals.converted / executiveTotals.total) * 100).toFixed(1)
+            : "0.0";
+
     return (
-        <section className="min-h-screen bg-slate-50 px-4 py-8 sm:px-8 print:p-0 print:bg-white">
-            <div className="mx-auto max-w-7xl space-y-6">
+        <section className="min-h-screen bg-slate-50 px-4 py-8 sm:px-8 print:p-0 print:bg-white print:min-h-0">
+            <div className="mx-auto max-w-7xl space-y-6 print:max-w-none print:w-full print:space-y-4">
                 {/* ========================================================================= */}
                 {/* 1. HEADER SECTION */}
                 {/* ========================================================================= */}
@@ -528,7 +568,7 @@ function AdminCounsellorPerformance() {
                             </Link>
                             <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-0.5 font-bold uppercase tracking-wider text-blue-700">
-                                <Sparkles className="h-3 w-3" />
+                                {/* <Sparkles className="h-3 w-3" /> */}
                                 Analytics &amp; Reports
                             </span>
                         </div>
@@ -573,19 +613,40 @@ function AdminCounsellorPerformance() {
                 </div>
 
                 {/* Print Header (Only visible when printing / saving PDF) */}
-                <div className="hidden print:block border-b-2 border-slate-800 pb-4 mb-6">
-                    <div className="flex justify-between items-start">
+                <div className="hidden print:block border-b-2 border-slate-900 pb-4 mb-4">
+                    <div className="flex items-start justify-between gap-4">
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900">
-                                Academy Counsellor Performance &amp; Conversion Report
+                            <div className="flex items-center gap-2">
+
+                                <span className="text-xs font-bold text-slate-500">
+                                    Being Iban Academy
+                                </span>
+                            </div>
+                            <h1 className="mt-1 text-xl font-black text-slate-900">
+                                Counsellor Performance &amp; Conversion Report
                             </h1>
-                            <p className="text-xs text-slate-500 mt-1">
-                                Generated on {new Date().toLocaleString("en-IN", { dateStyle: "long", timeStyle: "short" })}
-                            </p>
+                            <div className="mt-1 flex flex-wrap items-center gap-3 text-[11px] text-slate-600">
+                                <span>
+                                    <strong>Period:</strong> {from || to ? `${from || "Start"} to ${to || "Today"}` : "All Time Records"}
+                                </span>
+                                <span>•</span>
+                                <span>
+                                    <strong>Counsellor:</strong> {counsellorId ? (counsellorsList.find(c => c._id === counsellorId)?.name || "Filtered") : "All Staff"}
+                                </span>
+                                <span>•</span>
+                                <span>
+                                    <strong>Course:</strong> {courseId ? (coursesList.find(c => c._id === courseId)?.name || "Filtered") : "All Courses"}
+                                </span>
+                            </div>
                         </div>
-                        <div className="text-right text-xs text-slate-600">
-                            <p className="font-bold">Bengal Institute of Animation Arts</p>
-                            <p>Admin Operations Directorate</p>
+
+                        <div className="text-right shrink-0">
+                            <p className="text-[11px] font-bold text-slate-800">
+                                Generated: {new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                            </p>
+                            <p className="text-[10px] text-slate-500">
+                                {new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })} IST
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -593,18 +654,18 @@ function AdminCounsellorPerformance() {
                 {/* ========================================================================= */}
                 {/* 2. TOP SUMMARY METRICS CARDS */}
                 {/* ========================================================================= */}
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-5">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-5 print:grid-cols-5 print:gap-2.5 print:mb-4">
                     {/* Total Candidates */}
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs">
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs print:p-2.5 print:rounded-xl print:border-slate-300 print:shadow-none print:break-inside-avoid">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 print:text-[10px]">
                                 Total Inquiries
                             </span>
-                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                                <Users className="h-4 w-4" />
+                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 print:h-6 print:w-6">
+                                <Users className="h-4 w-4 print:h-3 print:w-3" />
                             </div>
                         </div>
-                        <p className="mt-2 text-2xl font-black text-slate-900">
+                        <p className="mt-2 text-2xl font-black text-slate-900 print:text-xl">
                             {summary ? summary.totalCandidates : 0}
                         </p>
                         <div className="mt-1 flex items-center gap-2 text-[10px] text-slate-500">
@@ -615,16 +676,16 @@ function AdminCounsellorPerformance() {
                     </div>
 
                     {/* Overall Conversion Rate */}
-                    <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 shadow-2xs">
+                    <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 shadow-2xs print:p-2.5 print:rounded-xl print:border-emerald-300 print:shadow-none print:break-inside-avoid">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 print:text-[10px]">
                                 Conversion Rate
                             </span>
-                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800">
-                                <Percent className="h-4 w-4" />
+                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 print:h-6 print:w-6">
+                                <Percent className="h-4 w-4 print:h-3 print:w-3" />
                             </div>
                         </div>
-                        <p className="mt-2 text-2xl font-black text-emerald-800">
+                        <p className="mt-2 text-2xl font-black text-emerald-800 print:text-xl">
                             {summary ? `${summary.overallConversionRate}%` : "0%"}
                         </p>
                         <p className="mt-1 text-[10px] font-semibold text-emerald-700">
@@ -633,34 +694,34 @@ function AdminCounsellorPerformance() {
                     </div>
 
                     {/* Closed Candidates */}
-                    <div className="rounded-2xl border border-purple-100 bg-purple-50/60 p-4 shadow-2xs">
+                    <div className="rounded-2xl border border-purple-100 bg-purple-50/60 p-4 shadow-2xs print:p-2.5 print:rounded-xl print:border-purple-300 print:shadow-none print:break-inside-avoid">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-purple-700">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 print:text-[10px]">
                                 Closed Pipeline
                             </span>
-                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-100 text-purple-800">
-                                <Target className="h-4 w-4" />
+                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-100 text-blue-800 print:h-6 print:w-6">
+                                <Target className="h-4 w-4 print:h-3 print:w-3" />
                             </div>
                         </div>
-                        <p className="mt-2 text-2xl font-black text-purple-800">
+                        <p className="mt-2 text-2xl font-black text-blue-800 print:text-xl">
                             {summary ? summary.closedCount : 0}
                         </p>
-                        <p className="mt-1 text-[10px] text-purple-700 font-medium">
+                        <p className="mt-1 text-[10px] text-blue-700 font-medium">
                             {summary?.closedToStudentConversionRate || 0}% closed conversion
                         </p>
                     </div>
 
                     {/* Total Follow-ups Logged */}
-                    <div className="rounded-2xl border border-amber-100 bg-amber-50/60 p-4 shadow-2xs">
+                    <div className="rounded-2xl border border-amber-100 bg-amber-50/60 p-4 shadow-2xs print:p-2.5 print:rounded-xl print:border-amber-300 print:shadow-none print:break-inside-avoid">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 print:text-[10px]">
                                 Follow-up Calls
                             </span>
-                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
-                                <Clock className="h-4 w-4" />
+                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 text-amber-800 print:h-6 print:w-6">
+                                <Clock className="h-4 w-4 print:h-3 print:w-3" />
                             </div>
                         </div>
-                        <p className="mt-2 text-2xl font-black text-amber-800">
+                        <p className="mt-2 text-2xl font-black text-amber-800 print:text-xl">
                             {summary ? summary.totalFollowUps : 0}
                         </p>
                         <p className="mt-1 text-[10px] text-amber-700">
@@ -669,16 +730,16 @@ function AdminCounsellorPerformance() {
                     </div>
 
                     {/* Active Counsellors */}
-                    <div className="col-span-2 sm:col-span-4 lg:col-span-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs">
+                    <div className="col-span-2 sm:col-span-4 lg:col-span-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs print:col-span-1 print:p-2.5 print:rounded-xl print:border-slate-300 print:shadow-none print:break-inside-avoid">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 print:text-[10px]">
                                 Active Staff
                             </span>
-                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-                                <UserCheck className="h-4 w-4" />
+                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 print:h-6 print:w-6">
+                                <UserCheck className="h-4 w-4 print:h-3 print:w-3" />
                             </div>
                         </div>
-                        <p className="mt-2 text-2xl font-black text-slate-900">
+                        <p className="mt-2 text-2xl font-black text-slate-900 print:text-xl">
                             {performanceList.length}
                         </p>
                         <p className="mt-1 text-[10px] text-slate-400">
@@ -779,7 +840,7 @@ function AdminCounsellorPerformance() {
                         {/* Param 3: counsellorId */}
                         <div>
                             <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-600">
-                                Counsellor (counsellorId)
+                                Counsellor
                             </label>
                             <select
                                 value={counsellorId}
@@ -798,7 +859,7 @@ function AdminCounsellorPerformance() {
                         {/* Param 4: courseId */}
                         <div>
                             <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-600">
-                                Course (courseId)
+                                Course
                             </label>
                             <select
                                 value={courseId}
@@ -823,11 +884,10 @@ function AdminCounsellorPerformance() {
                     <button
                         type="button"
                         onClick={() => setActiveTab("performance")}
-                        className={`inline-flex items-center gap-2 border-b-2 px-5 py-3 text-xs font-bold cursor-pointer transition ${
-                            activeTab === "performance"
-                                ? "border-blue-600 text-blue-600"
-                                : "border-transparent text-slate-500 hover:text-slate-800"
-                        }`}
+                        className={`inline-flex items-center gap-2 border-b-2 px-5 py-3 text-xs font-bold cursor-pointer transition ${activeTab === "performance"
+                            ? "border-blue-600 text-blue-600"
+                            : "border-transparent text-slate-500 hover:text-slate-800"
+                            }`}
                     >
                         <Users className="h-4 w-4" />
                         <span>Counsellor Overview ({performanceList.length})</span>
@@ -836,11 +896,10 @@ function AdminCounsellorPerformance() {
                     <button
                         type="button"
                         onClick={() => setActiveTab("report")}
-                        className={`inline-flex items-center gap-2 border-b-2 px-5 py-3 text-xs font-bold cursor-pointer transition ${
-                            activeTab === "report"
-                                ? "border-blue-600 text-blue-600"
-                                : "border-transparent text-slate-500 hover:text-slate-800"
-                        }`}
+                        className={`inline-flex items-center gap-2 border-b-2 px-5 py-3 text-xs font-bold cursor-pointer transition ${activeTab === "report"
+                            ? "border-blue-600 text-blue-600"
+                            : "border-transparent text-slate-500 hover:text-slate-800"
+                            }`}
                     >
                         <PieChartIcon className="h-4 w-4" />
                         <span>Executive Reports &amp; Charts ({reportList.length})</span>
@@ -897,9 +956,9 @@ function AdminCounsellorPerformance() {
                                             {/* Top Row: Counsellor Info & Conversion Pill */}
                                             <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-base font-bold text-white shadow-md shadow-blue-500/20">
+                                                    {/* <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-base font-bold text-white shadow-md shadow-blue-500/20">
                                                         {getInitials(counsellor.counsellorName)}
-                                                    </div>
+                                                    </div> */}
                                                     <div>
                                                         <h3 className="text-base font-black text-slate-900">
                                                             {counsellor.counsellorName}
@@ -962,7 +1021,7 @@ function AdminCounsellorPerformance() {
                                                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                                                         Closed Leads
                                                     </span>
-                                                    <p className="mt-1 text-base font-black text-purple-600">
+                                                    <p className="mt-1 text-base font-black text-blue-600">
                                                         {counsellor.statusBreakdown?.closed || 0}
                                                     </p>
                                                     <span className="text-[10px] text-slate-500">
@@ -1050,14 +1109,14 @@ function AdminCounsellorPerformance() {
                 {activeTab === "report" && (
                     <div className="space-y-6">
                         {/* Visual Analytics Row: 3 Interactive Charts */}
-                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 print:gap-3 print:mb-4 print:break-inside-avoid">
                             {/* Chart 1: Status Distribution */}
-                            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-2xs">
-                                <div className="border-b border-slate-100 pb-3 mb-4">
-                                    <h3 className="text-sm font-bold text-slate-900">
+                            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-2xs print:p-3.5 print:rounded-2xl print:border-slate-300 print:shadow-none print:break-inside-avoid">
+                                <div className="border-b border-slate-100 pb-3 mb-4 print:pb-2 print:mb-2">
+                                    <h3 className="text-sm font-bold text-slate-900 print:text-xs">
                                         Pipeline Status Breakdown
                                     </h3>
-                                    <p className="text-[11px] text-slate-400">
+                                    <p className="text-[11px] text-slate-400 print:text-[10px]">
                                         Distribution of all candidate stages
                                     </p>
                                 </div>
@@ -1070,12 +1129,12 @@ function AdminCounsellorPerformance() {
                             </div>
 
                             {/* Chart 2: Intake Source Ratio */}
-                            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-2xs">
-                                <div className="border-b border-slate-100 pb-3 mb-4">
-                                    <h3 className="text-sm font-bold text-slate-900">
+                            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-2xs print:p-3.5 print:rounded-2xl print:border-slate-300 print:shadow-none print:break-inside-avoid">
+                                <div className="border-b border-slate-100 pb-3 mb-4 print:pb-2 print:mb-2">
+                                    <h3 className="text-sm font-bold text-slate-900 print:text-xs">
                                         Ingestion Channel Mix
                                     </h3>
-                                    <p className="text-[11px] text-slate-400">
+                                    <p className="text-[11px] text-slate-400 print:text-[10px]">
                                         Walk-in visits vs online inquiries
                                     </p>
                                 </div>
@@ -1088,12 +1147,12 @@ function AdminCounsellorPerformance() {
                             </div>
 
                             {/* Chart 3: Conversion Share */}
-                            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-2xs md:col-span-2 lg:col-span-1">
-                                <div className="border-b border-slate-100 pb-3 mb-4">
-                                    <h3 className="text-sm font-bold text-slate-900">
+                            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-2xs md:col-span-2 lg:col-span-1 print:col-span-1 print:p-3.5 print:rounded-2xl print:border-slate-300 print:shadow-none print:break-inside-avoid">
+                                <div className="border-b border-slate-100 pb-3 mb-4 print:pb-2 print:mb-2">
+                                    <h3 className="text-sm font-bold text-slate-900 print:text-xs">
                                         Counsellor Conversion Share
                                     </h3>
-                                    <p className="text-[11px] text-slate-400">
+                                    <p className="text-[11px] text-slate-400 print:text-[10px]">
                                         Conversions delivered by staff
                                     </p>
                                 </div>
@@ -1106,47 +1165,175 @@ function AdminCounsellorPerformance() {
                             </div>
                         </div>
 
-                        {/* Executive Performance Matrix Table (from `counsellorPerformanceUrl.report`) */}
-                        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xs">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 bg-slate-50/70 p-5 gap-3">
+                        {/* Executive Performance Dossier & Performance Matrix */}
+                        <div className="space-y-4">
+                            {/* Section Header with Actions & View Toggle (Screen Only) */}
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-3xl border border-slate-200 bg-white p-5 gap-3 shadow-2xs print:hidden">
                                 <div>
-                                    <h3 className="text-sm font-bold text-slate-900">
-                                        Consolidated Performance Matrix
-                                    </h3>
-                                    <p className="text-xs text-slate-500">
-                                        Official performance report data retrieved from /api/reports/counsellor-performance
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="text-sm font-bold text-slate-900">
+                                            Executive Counsellor Performance Dossier
+                                        </h3>
+                                        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">
+                                            {executiveReportData.length} Counsellors
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-0.5">
+                                        Responsive conversion analytics, pipeline breakdown, and staff evaluation
                                     </p>
                                 </div>
 
-                                <div className="flex items-center gap-2 print:hidden">
+                                <div className="flex flex-wrap items-center gap-2.5">
+                                    {/* View Toggle on Screen */}
+                                    <div className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-100/80 p-0.5 text-xs">
+                                        <button
+                                            type="button"
+                                            onClick={() => setExecutiveViewMode("cards")}
+                                            className={`inline-flex items-center gap-1.5 cursor-pointer rounded-lg px-3 py-1 text-xs font-bold transition ${executiveViewMode === "cards"
+                                                ? "bg-white text-blue-700 shadow-2xs"
+                                                : "text-slate-600 hover:text-slate-900"
+                                                }`}
+                                        >
+                                            <LayoutGrid className="h-3.5 w-3.5" />
+                                            <span>Cards View</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setExecutiveViewMode("table")}
+                                            className={`inline-flex items-center gap-1.5 cursor-pointer rounded-lg px-3 py-1 text-xs font-bold transition ${executiveViewMode === "table"
+                                                ? "bg-white text-blue-700 shadow-2xs"
+                                                : "text-slate-600 hover:text-slate-900"
+                                                }`}
+                                        >
+                                            <TableIcon className="h-3.5 w-3.5" />
+                                            <span>Table View</span>
+                                        </button>
+                                    </div>
+
+                                    {/* Action Buttons */}
                                     <button
                                         type="button"
                                         onClick={handleExportExcel}
-                                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100"
+                                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs"
                                     >
                                         <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-600" />
-                                        <span>Download CSV / Excel</span>
+                                        <span>Export CSV / Excel</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleExportPDF}
+                                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-slate-900 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition shadow-sm"
+                                    >
+                                        <Printer className="h-3.5 w-3.5" />
+                                        <span>Print Executive PDF</span>
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left border-collapse text-xs">
-                                    <thead>
-                                        <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                                            <th className="px-5 py-3.5">Counsellor</th>
-                                            <th className="px-5 py-3.5 text-center">Total Inquiries</th>
-                                            <th className="px-5 py-3.5 text-center">Ongoing</th>
-                                            <th className="px-5 py-3.5 text-center">Interested</th>
-                                            <th className="px-5 py-3.5 text-center">Closed</th>
-                                            <th className="px-5 py-3.5 text-center">Converted</th>
-                                            <th className="px-5 py-3.5 text-center">Pending Appr.</th>
-                                            <th className="px-5 py-3.5 text-center">Follow-ups</th>
-                                            <th className="px-5 py-3.5 text-right">Conversion Rate</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100">
-                                        {(reportList.length > 0 ? reportList : performanceList).map((item, idx) => {
+                            {/* Print-Only Section Title */}
+                            <div className="hidden print:flex items-center justify-between border-b border-slate-300 pb-2 mb-3">
+                                <div>
+                                    <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+                                        Executive Counsellor Performance Dossier
+                                    </h2>
+                                    <p className="text-[10px] text-slate-500">
+                                        Academy conversion aggregates, inquiry allocation, and performance benchmarks
+                                    </p>
+                                </div>
+                                <span className="rounded-md border border-slate-300 bg-slate-50 px-2 py-0.5 text-[10px] font-bold text-slate-700">
+                                    {executiveReportData.length} Staff Profiles Evaluated
+                                </span>
+                            </div>
+
+                            {/* Consolidated Academy KPI Benchmark Summary Strip */}
+
+                            <div className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-800 shadow-sm print:border-slate-300 print:bg-white print:p-3 print:rounded-xl print:break-inside-avoid">
+
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200 pb-3 print:pb-2 mb-3 print:mb-2">
+
+                                    <div className="flex items-center gap-2">
+                                        <Award className="h-4 w-4 text-amber-500" />
+                                        <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                                            Academy Performance Aggregates
+                                        </span>
+                                    </div>
+
+                                    <span className="text-xs text-slate-500 font-medium">
+                                        Overall Benchmark:{" "}
+                                        <strong className="text-emerald-700 font-bold">
+                                            {executiveOverallRate}% Conversion
+                                        </strong>
+                                    </span>
+
+                                </div>
+
+                                <div className="grid grid-cols-2 sm:grid-cols-5 print:grid-cols-5 gap-3 text-center">
+
+                                    {/* Total Inquiries */}
+                                    <div className="rounded-xl bg-slate-50 p-2 print:p-1.5 border border-slate-200">
+                                        <span className="text-[9px] uppercase tracking-wider text-slate-500 block font-semibold">
+                                            Total Inquiries
+                                        </span>
+                                        <span className="text-lg font-black text-slate-800 block mt-0.5 print:text-base">
+                                            {executiveTotals.total}
+                                        </span>
+                                    </div>
+
+                                    {/* Enrolled Students */}
+                                    <div className="rounded-xl bg-emerald-50 p-2 print:p-1.5 border border-emerald-200">
+                                        <span className="text-[9px] uppercase tracking-wider text-emerald-700 block font-semibold">
+                                            Enrolled Students
+                                        </span>
+                                        <span className="text-lg font-black text-emerald-800 block mt-0.5 print:text-base">
+                                            {executiveTotals.converted}
+                                        </span>
+                                    </div>
+
+                                    {/* Closed Pipeline */}
+                                    <div className="rounded-xl bg-blue-50 p-2 print:p-1.5 border border-blue-200">
+                                        <span className="text-[9px] uppercase tracking-wider text-blue-700 block font-semibold">
+                                            Closed Pipeline
+                                        </span>
+                                        <span className="text-lg font-black text-blue-800 block mt-0.5 print:text-base">
+                                            {executiveTotals.closed}
+                                        </span>
+                                    </div>
+
+                                    {/* Follow-up Calls */}
+                                    <div className="rounded-xl bg-amber-50 p-2 print:p-1.5 border border-amber-200">
+                                        <span className="text-[9px] uppercase tracking-wider text-amber-700 block font-semibold">
+                                            Follow-up Calls
+                                        </span>
+                                        <span className="text-lg font-black text-amber-800 block mt-0.5 print:text-base">
+                                            {executiveTotals.followUps}
+                                        </span>
+                                    </div>
+
+                                    {/* Conversion Rate */}
+                                    <div className="rounded-xl bg-purple-50 p-2 print:p-1.5 border border-purple-200 col-span-2 sm:col-span-1 print:col-span-1">
+                                        <span className="text-[9px] uppercase tracking-wider text-purple-700 block font-semibold">
+                                            Conversion Rate
+                                        </span>
+                                        <span className="text-lg font-black text-purple-800 block mt-0.5 print:text-base">
+                                            {executiveOverallRate}%
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            {/* NON-TABLE EXECUTIVE PERFORMANCE CARDS GRID */}
+                            {/* (Visible on screen in 'cards' mode, excluded from print/PDF) */}
+                            <div className={`${executiveViewMode === "cards" ? "block" : "hidden"} print:hidden space-y-4`}>
+                                {executiveReportData.length === 0 ? (
+                                    <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-xs text-slate-500 shadow-2xs">
+                                        No counsellor report records found for the selected parameters.
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-4 print:gap-3">
+                                        {executiveReportData.map((item, idx) => {
                                             const total = item.totalLeads ?? item.totalCandidates ?? 0;
                                             const ongoing = item.ongoing ?? item.statusBreakdown?.ongoing ?? 0;
                                             const interested = item.interested ?? item.statusBreakdown?.interested ?? 0;
@@ -1155,56 +1342,313 @@ function AdminCounsellorPerformance() {
                                             const pending = item.pendingApproval ?? item.conversionMetrics?.pendingConversion ?? 0;
                                             const followUps = item.followUps ?? item.totalFollowUps ?? 0;
                                             const rate = total > 0 ? ((converted / total) * 100).toFixed(1) : "0.0";
+                                            const cId = item.counsellorId || item._id;
+
+                                            // Find extended counsellor performance details if available
+                                            const perfDetail = performanceList.find(
+                                                (p) => p.counsellorId === cId || p._id === cId
+                                            );
+                                            const leadsCount = perfDetail?.leadsCount ?? item.leadsCount;
+                                            const walkInsCount = perfDetail?.walkInsCount ?? item.walkInsCount;
+                                            const phone = perfDetail?.counsellorPhone || item.counsellorPhone;
 
                                             return (
-                                                <tr key={item._id || item.counsellorId || idx} className="hover:bg-slate-50/60 transition">
-                                                    <td className="px-5 py-4 font-bold text-slate-900">
-                                                        <div className="flex items-center gap-2.5">
-                                                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-700 font-bold text-xs">
+                                                <div
+                                                    key={cId || idx}
+                                                    className="rounded-2xl border border-slate-200 bg-white p-4.5 shadow-2xs transition hover:shadow-xs print:rounded-2xl print:border print:border-slate-300 print:bg-white print:p-3.5 print:shadow-none print:break-inside-avoid space-y-3"
+                                                >
+                                                    {/* Card Header: Counsellor Profile & Conversion Badge */}
+                                                    <div className="flex items-start justify-between gap-3 border-b border-slate-100 print:border-slate-200 pb-3">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-xs">
                                                                 {getInitials(item.counsellorName)}
                                                             </div>
-                                                            <div>
-                                                                <p className="font-bold text-slate-900">{item.counsellorName || "Counsellor"}</p>
-                                                                <p className="text-[10px] text-slate-400 font-mono">
-                                                                    ID: {item.counsellorId || item._id}
-                                                                </p>
+                                                            <div className="min-w-0">
+                                                                <h4 className="text-sm font-black text-slate-900 truncate">
+                                                                    {item.counsellorName || "Counsellor Staff"}
+                                                                </h4>
+                                                                <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-500 mt-0.5">
+                                                                    <span className="font-mono bg-slate-100 px-1.5 py-0.2 rounded text-slate-600">
+                                                                        ID: {cId ? String(cId).slice(-6) : "STAFF"}
+                                                                    </span>
+                                                                    {phone && (
+                                                                        <span className="flex items-center gap-0.5">
+                                                                            <Phone className="h-2.5 w-2.5 text-slate-400" />
+                                                                            {phone}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </td>
-                                                    <td className="px-5 py-4 text-center font-bold text-slate-800">
-                                                        {total}
-                                                    </td>
-                                                    <td className="px-5 py-4 text-center text-blue-600 font-semibold">
-                                                        {ongoing}
-                                                    </td>
-                                                    <td className="px-5 py-4 text-center text-emerald-600 font-semibold">
-                                                        {interested}
-                                                    </td>
-                                                    <td className="px-5 py-4 text-center text-purple-600 font-semibold">
-                                                        {closed}
-                                                    </td>
-                                                    <td className="px-5 py-4 text-center">
-                                                        <span className="inline-block rounded-md bg-emerald-100/70 px-2 py-0.5 text-xs font-bold text-emerald-800">
-                                                            {converted}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-5 py-4 text-center text-slate-500 font-semibold">
-                                                        {pending}
-                                                    </td>
-                                                    <td className="px-5 py-4 text-center text-amber-700 font-semibold">
-                                                        {followUps}
-                                                    </td>
-                                                    <td className="px-5 py-4 text-right">
-                                                        <span className="inline-flex items-center gap-1 font-black text-emerald-700 text-sm">
-                                                            {rate}%
-                                                        </span>
-                                                    </td>
-                                                </tr>
+
+                                                        <div className="text-right shrink-0">
+                                                            <div className="inline-flex items-center gap-1 rounded-xl border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-emerald-800 font-black text-xs">
+                                                                <Target className="h-3 w-3 text-emerald-600" />
+                                                                <span>{rate}% Conv.</span>
+                                                            </div>
+                                                            <p className="mt-1 text-[10px] font-semibold text-emerald-700">
+                                                                {converted} Enrolled of {total}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Visual Conversion Progress Bar */}
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center justify-between text-[10px] font-bold">
+                                                            <span className="text-slate-500 uppercase tracking-wider text-[9px]">Conversion Efficiency</span>
+                                                            <span className="text-emerald-700 font-mono">{rate}%</span>
+                                                        </div>
+                                                        <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                                                            <div
+                                                                className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-300"
+                                                                style={{ width: `${Math.min(100, Math.max(0, Number(rate)))}%` }}
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Metric Grid: 8 Executive Chips */}
+                                                    <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                                                        {/* Total Inquiries */}
+                                                        <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-2 print:p-1.5">
+                                                            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block truncate">
+                                                                Total Inquiries
+                                                            </span>
+                                                            <span className="text-sm font-black text-slate-900 block mt-0.5">
+                                                                {total}
+                                                            </span>
+                                                            <span className="text-[9px] text-slate-500 block truncate">
+                                                                {leadsCount !== undefined ? `${leadsCount}L • ${walkInsCount}W` : "All Channels"}
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Converted */}
+                                                        <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-2 print:p-1.5">
+                                                            <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-700 block truncate">
+                                                                Converted
+                                                            </span>
+                                                            <span className="text-sm font-black text-emerald-800 block mt-0.5">
+                                                                {converted}
+                                                            </span>
+                                                            <span className="text-[9px] font-semibold text-emerald-600 block truncate">
+                                                                Enrolled
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Closed */}
+                                                        <div className="rounded-xl border border-purple-100 bg-purple-50/70 p-2 print:p-1.5">
+                                                            <span className="text-[9px] font-bold uppercase tracking-wider text-purple-700 block truncate">
+                                                                Closed
+                                                            </span>
+                                                            <span className="text-sm font-black text-purple-800 block mt-0.5">
+                                                                {closed}
+                                                            </span>
+                                                            <span className="text-[9px] text-purple-600 block truncate">
+                                                                Pipeline
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Ongoing */}
+                                                        <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-2 print:p-1.5">
+                                                            <span className="text-[9px] font-bold uppercase tracking-wider text-blue-700 block truncate">
+                                                                Ongoing
+                                                            </span>
+                                                            <span className="text-sm font-black text-blue-800 block mt-0.5">
+                                                                {ongoing}
+                                                            </span>
+                                                            <span className="text-[9px] text-blue-600 block truncate">
+                                                                Active Stage
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Interested */}
+                                                        <div className="rounded-xl border border-teal-100 bg-teal-50/70 p-2 print:p-1.5">
+                                                            <span className="text-[9px] font-bold uppercase tracking-wider text-teal-700 block truncate">
+                                                                Interested
+                                                            </span>
+                                                            <span className="text-sm font-black text-teal-800 block mt-0.5">
+                                                                {interested}
+                                                            </span>
+                                                            <span className="text-[9px] text-teal-600 block truncate">
+                                                                Warm Leads
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Follow-ups */}
+                                                        <div className="rounded-xl border border-amber-100 bg-amber-50/70 p-2 print:p-1.5">
+                                                            <span className="text-[9px] font-bold uppercase tracking-wider text-amber-700 block truncate">
+                                                                Follow-ups
+                                                            </span>
+                                                            <span className="text-sm font-black text-amber-800 block mt-0.5">
+                                                                {followUps}
+                                                            </span>
+                                                            <span className="text-[9px] text-amber-600 block truncate">
+                                                                Discussions
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Pending Approval */}
+                                                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-2 print:p-1.5">
+                                                            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 block truncate">
+                                                                Pending
+                                                            </span>
+                                                            <span className="text-sm font-black text-slate-700 block mt-0.5">
+                                                                {pending}
+                                                            </span>
+                                                            <span className="text-[9px] text-slate-400 block truncate">
+                                                                Approval
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Conversion Rate */}
+                                                        <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-2 print:p-1.5">
+                                                            <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-700 block truncate">
+                                                                Conv. Rate
+                                                            </span>
+                                                            <span className="text-sm font-black text-emerald-800 block mt-0.5">
+                                                                {rate}%
+                                                            </span>
+                                                            <span className="text-[9px] font-semibold text-emerald-600 block truncate">
+                                                                Efficiency
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Pipeline Mini Spectrum Ratio */}
+                                                    {total > 0 && (
+                                                        <div className="space-y-1 pt-1">
+                                                            <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                                                                {converted > 0 && (
+                                                                    <div
+                                                                        style={{ width: `${(converted / total) * 100}%` }}
+                                                                        className="bg-emerald-500"
+                                                                        title={`Converted: ${converted}`}
+                                                                    />
+                                                                )}
+                                                                {closed > 0 && (
+                                                                    <div
+                                                                        style={{ width: `${(closed / total) * 100}%` }}
+                                                                        className="bg-purple-500"
+                                                                        title={`Closed: ${closed}`}
+                                                                    />
+                                                                )}
+                                                                {ongoing > 0 && (
+                                                                    <div
+                                                                        style={{ width: `${(ongoing / total) * 100}%` }}
+                                                                        className="bg-blue-500"
+                                                                        title={`Ongoing: ${ongoing}`}
+                                                                    />
+                                                                )}
+                                                                {interested > 0 && (
+                                                                    <div
+                                                                        style={{ width: `${(interested / total) * 100}%` }}
+                                                                        className="bg-teal-400"
+                                                                        title={`Interested: ${interested}`}
+                                                                    />
+                                                                )}
+                                                            </div>
+                                                            <div className="flex items-center justify-between text-[9px] text-slate-400">
+                                                                <span>Pipeline Spectrum</span>
+                                                                <span className="font-mono text-slate-500 font-semibold">{total} Total</span>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             );
                                         })}
-                                    </tbody>
-                                </table>
+                                    </div>
+                                )}
                             </div>
+
+                            {/* SCREEN TABLE VIEW (ONLY SHOWN ON SCREEN WHEN USER SELECTS TABLE VIEW - ALWAYS HIDDEN IN PRINT / PDF) */}
+                            {executiveViewMode === "table" && (
+                                <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xs print:hidden">
+                                    <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/70 p-4">
+                                        <div>
+                                            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                                                Performance Matrix Data Grid
+                                            </h4>
+                                            <p className="text-[11px] text-slate-500">
+                                                Raw data overview table (Note: In PDF export, the responsive cards layout is automatically used)
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left border-collapse text-xs">
+                                            <thead>
+                                                <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                                                    <th className="px-5 py-3.5">Counsellor</th>
+                                                    <th className="px-5 py-3.5 text-center">Total Inquiries</th>
+                                                    <th className="px-5 py-3.5 text-center">Ongoing</th>
+                                                    <th className="px-5 py-3.5 text-center">Interested</th>
+                                                    <th className="px-5 py-3.5 text-center">Closed</th>
+                                                    <th className="px-5 py-3.5 text-center">Converted</th>
+                                                    <th className="px-5 py-3.5 text-center">Pending Appr.</th>
+                                                    <th className="px-5 py-3.5 text-center">Follow-ups</th>
+                                                    <th className="px-5 py-3.5 text-right">Conversion Rate</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-100">
+                                                {executiveReportData.map((item, idx) => {
+                                                    const total = item.totalLeads ?? item.totalCandidates ?? 0;
+                                                    const ongoing = item.ongoing ?? item.statusBreakdown?.ongoing ?? 0;
+                                                    const interested = item.interested ?? item.statusBreakdown?.interested ?? 0;
+                                                    const closed = item.closed ?? item.statusBreakdown?.closed ?? 0;
+                                                    const converted = item.converted ?? item.conversionMetrics?.converted ?? 0;
+                                                    const pending = item.pendingApproval ?? item.conversionMetrics?.pendingConversion ?? 0;
+                                                    const followUps = item.followUps ?? item.totalFollowUps ?? 0;
+                                                    const rate = total > 0 ? ((converted / total) * 100).toFixed(1) : "0.0";
+
+                                                    return (
+                                                        <tr key={item._id || item.counsellorId || idx} className="hover:bg-slate-50/60 transition">
+                                                            <td className="px-5 py-4 font-bold text-slate-900">
+                                                                <div className="flex items-center gap-2.5">
+                                                                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-700 font-bold text-xs">
+                                                                        {getInitials(item.counsellorName)}
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="font-bold text-slate-900">{item.counsellorName || "Counsellor"}</p>
+                                                                        <p className="text-[10px] text-slate-400 font-mono">
+                                                                            ID: {item.counsellorId || item._id}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-5 py-4 text-center font-bold text-slate-800">
+                                                                {total}
+                                                            </td>
+                                                            <td className="px-5 py-4 text-center text-blue-600 font-semibold">
+                                                                {ongoing}
+                                                            </td>
+                                                            <td className="px-5 py-4 text-center text-emerald-600 font-semibold">
+                                                                {interested}
+                                                            </td>
+                                                            <td className="px-5 py-4 text-center text-purple-600 font-semibold">
+                                                                {closed}
+                                                            </td>
+                                                            <td className="px-5 py-4 text-center">
+                                                                <span className="inline-block rounded-md bg-emerald-100/70 px-2 py-0.5 text-xs font-bold text-emerald-800">
+                                                                    {converted}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-5 py-4 text-center text-slate-500 font-semibold">
+                                                                {pending}
+                                                            </td>
+                                                            <td className="px-5 py-4 text-center text-amber-700 font-semibold">
+                                                                {followUps}
+                                                            </td>
+                                                            <td className="px-5 py-4 text-right">
+                                                                <span className="inline-flex items-center gap-1 font-black text-emerald-700 text-sm">
+                                                                    {rate}%
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

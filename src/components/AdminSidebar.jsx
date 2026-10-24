@@ -16,7 +16,7 @@ import {
 import logo from "../assets/bia.png";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { FaHeart, FaInstagram, FaUserPlus } from "react-icons/fa";
-import { User, UserPlus, UserRoundGroup, BarChart3, Mail } from "lucide-react";
+import { User, UserPlus, UserRoundGroup, BarChart3, Mail, Send } from "lucide-react";
 import { PiStudentBold } from "react-icons/pi";
 import { BiCategory } from "react-icons/bi";
 
@@ -30,7 +30,8 @@ const NAV_ITEMS = [
     { label: "Performance", icon: BarChart3, to: "/admin/counsellors-performance" },
     { label: "Sources", icon: FaInstagram, to: "/admin/sources" },
     { label: "Courses", icon: BiCategory, to: "/admin/courses" },
-    { label: "Emails", icon: Mail, to: "/admin/emails" },
+    { label: "Email Template", icon: Mail, to: "/admin/emailtemplate" },
+    { label: "Send Emails", icon: Send, to: "/admin/sendemail" },
     // { label: "Settings", icon: FiSettings, to: "/admin/settings" },
 ];
 
@@ -52,7 +53,7 @@ const AdminSidebar = () => {
             {isOpen && (
                 <div
                     onClick={closeSidebar}
-                    className="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-[2px] md:hidden"
+                    className="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-[2px] md:hidden print:hidden"
                 />
             )}
 
@@ -69,6 +70,7 @@ const AdminSidebar = () => {
                     text-slate-200
                     shrink-0
                     shadow-2xl md:shadow-none
+                    print:hidden
 
                     transform
                     transition-transform
@@ -95,7 +97,7 @@ const AdminSidebar = () => {
                         />
                     </NavLink>
                 </div>
-
+               
                 <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
                     {NAV_ITEMS.map((item) => {
                         const Icon = item.icon;
