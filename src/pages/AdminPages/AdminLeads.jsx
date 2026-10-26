@@ -251,7 +251,6 @@ function AdminLeads() {
         limit,
     ]);
 
-    // Automatically reload leads whenever query params or page change
     useEffect(() => {
         loadLeads(true);
     }, [loadLeads]);

@@ -18,6 +18,8 @@ function SendEmailModal({
     leads = [],
     students = [],
     loadingRecipients = false,
+    tokenStorageKey = "adminToken",
+    authToken,
 }) {
     // Form fields
     const [selectedTemplateId, setSelectedTemplateId] = useState("");
@@ -138,8 +140,19 @@ function SendEmailModal({
 
         setSending(true);
         try {
-            const token = localStorage.getItem("token");
-            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+            const token =
+                authToken ||
+                (tokenStorageKey ? localStorage.getItem(tokenStorageKey) : null) ||
+                localStorage.getItem("adminToken") ||
+                localStorage.getItem("token");
+
+            if (!token) {
+                toast.error("Authentication token not found. Please log in again.");
+                setSending(false);
+                return;
+            }
+
+            const headers = { Authorization: `Bearer ${token}` };
 
             const payload = {
                 title: title.trim() || customSubject.trim(),

@@ -257,11 +257,7 @@ function CounsellorSendEmail() {
                         </button>
                     </div>
                 </div>
-
-                {/* ========================================================================= */}
-                {/* 2. STATS SUMMARY CARDS */}
-                {/* ========================================================================= */}
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {/* <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs">
                         <div className="flex items-center justify-between">
                             <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -329,7 +325,7 @@ function CounsellorSendEmail() {
                             Individual email inboxes
                         </p>
                     </div>
-                </div>
+                </div> */}
 
                 {/* ========================================================================= */}
                 {/* 3. SEARCH & FILTERS CONTAINER */}
@@ -505,6 +501,7 @@ function CounsellorSendEmail() {
                     leads={leads}
                     students={students}
                     loadingRecipients={loadingRecipients}
+                    tokenStorageKey="token"
                 />
 
                 <EmailLogDetailsModal

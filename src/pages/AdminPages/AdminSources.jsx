@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { adminApi } from "../../config/axios";
 import { adminUrl } from "../../config/config";
+import { SquarePen, Trash } from "lucide-react";
 
 const fetchSources = async () => {
 
@@ -50,8 +51,8 @@ function AdminSources() {
         if (isMounted) {
           toast.error(
             error.response?.data?.message ||
-              error.message ||
-              "Unable to load sources."
+            error.message ||
+            "Unable to load sources."
           );
         }
       } finally {
@@ -90,21 +91,21 @@ function AdminSources() {
       setLoading(true);
       const response = editingSource
         ? await adminApi.put(`${adminUrl.sources}/${editingSource._id}`, {
-            name: sourceName,
-          })
+          name: sourceName,
+        })
         : await adminApi.post(adminUrl.sources, { name: sourceName });
 
       if (response.data?.success === false) {
         toast.error(
           response.data.message ||
-            `Unable to ${editingSource ? "update" : "create"} source.`
+          `Unable to ${editingSource ? "update" : "create"} source.`
         );
         return;
       }
 
       toast.success(
         response.data?.message ||
-          `Source ${editingSource ? "updated" : "created"} successfully.`
+        `Source ${editingSource ? "updated" : "created"} successfully.`
       );
       resetForm();
       await loadSources();
@@ -295,11 +296,10 @@ function AdminSources() {
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-                            source.isActive
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "bg-slate-100 text-slate-600"
-                          }`}
+                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${source.isActive
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-slate-100 text-slate-600"
+                            }`}
                         >
                           {source.isActive ? "Active" : "Inactive"}
                         </span>
@@ -323,15 +323,18 @@ function AdminSources() {
                             onClick={() => handleEdit(source)}
                             className="rounded-lg border border-blue-200 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-50"
                           >
-                            Edit
+                            <SquarePen />
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDelete(source)}
                             className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50"
                           >
-                            Delete
+                            <Trash />
                           </button>
+
+
+                          
                         </div>
                       </td>
                     </tr>

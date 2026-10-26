@@ -3,7 +3,9 @@ export const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5173";
 export const authUrl = {
   login: `${BASE_URL}/api/auth/login`,
   register: `${BASE_URL}/api/auth/register-counsellor`,
-  changePassword: `${BASE_URL}/api/auth/changePassword`
+  changePassword: `${BASE_URL}/api/auth/changePassword`,
+  forgotPassword: `${BASE_URL}/api/auth/forgot-password`,
+  resetPassword: `${BASE_URL}/api/auth/reset-password`,
 };
 
 export const adminUrl = {
@@ -17,8 +19,10 @@ export const adminUrl = {
 
 export const counsellorUrl = {
   counsellorAll: `${BASE_URL}/api/counsellors/all`,
+  counsellorActive: `${BASE_URL}/api/counsellors/all-active`,
   statusUpdate: (counsellorId) => `${BASE_URL}/api/admin/counsellors/${counsellorId}/status`,
   deleteCounsellor: (counsellorId) => `${BASE_URL}/api/counsellors/${counsellorId}`,
+  me: `${BASE_URL}/api/counsellors/me`,
 };
 
 export const courseUrl = {
@@ -57,4 +61,4 @@ export const emailUrl = {
   send: `${BASE_URL}/api/emails/send`,
   logs: `${BASE_URL}/api/emails/logs`,
 };
-
+

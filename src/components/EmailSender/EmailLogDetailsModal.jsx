@@ -162,8 +162,12 @@ function EmailLogDetailsModal({ log, onClose }) {
                                 Dispatched By
                             </span>
                             <p className="mt-1 font-semibold text-slate-800">
-                                {typeof log.sentBy === "object" ? log.sentBy?.name || "Counsellor" : log.sentBy || "Counsellor"}
+                                Name:{" "}{typeof log.sentBy === "object" ? log.sentBy?.name || "Counsellor" : log.sentBy || "Counsellor"}
                             </p>
+                            <p className="mt-1 font-semibold text-slate-800">
+                                Username:{" "}{typeof log.sentBy === "object" ? log.sentBy?.username || "Counsellor" : log.sentBy || "Counsellor"}
+                            </p>
+
                         </div>
 
                         <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3.5">

@@ -21,6 +21,7 @@ import {
   CheckSquare,
   Square,
   Users,
+  Info,
 } from "lucide-react";
 import {
   sourcesUrl,
@@ -47,7 +48,7 @@ const CANDIDATE_STATUS_OPTIONS = [
 const GENDER_OPTIONS = [
   { value: "female", label: "Female" },
   { value: "male", label: "Male" },
-  { value: "other", label: "Other" },
+  // { value: "other", label: "Other" },
 ];
 
 const getTodayDate = () => {
@@ -103,7 +104,7 @@ function AdminAddLead() {
             .get(courseUrl.courses, { headers })
             .catch(() => ({ data: { data: [] } })),
           axios
-            .get(counsellorUrl.counsellorAll)
+            .get(counsellorUrl.counsellorActive)
             .catch(() => ({ data: { data: [] } })),
         ]);
 
@@ -269,7 +270,7 @@ function AdminAddLead() {
           <div>
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-700">
-                <Sparkles className="h-3.5 w-3.5" />
+                {/* <Sparkles className="h-3.5 w-3.5" /> */}
                 Admin Workspace
               </span>
               <span className="text-xs text-slate-400">•</span>
@@ -386,7 +387,7 @@ function AdminAddLead() {
                   Status <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <Sparkles className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Info className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   <select
                     id="candidateStatus"
                     name="candidateStatus"
@@ -508,7 +509,7 @@ function AdminAddLead() {
                 <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-700">
                   Gender <span className="text-rose-500">*</span>
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {GENDER_OPTIONS.map((g) => (
                     <button
                       key={g.value}

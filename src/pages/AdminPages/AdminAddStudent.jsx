@@ -97,7 +97,7 @@ function AdminAddStudent() {
 
         // 2. Fetch counsellors with NO authorization or custom headers as required
         const counsellorsPromise = axios
-          .get(`${counsellorUrl.counsellorAll}`)
+          .get(`${counsellorUrl.counsellorActive}`)
           .then((res) => {
             if (res.data?.success && Array.isArray(res.data.data)) {
               return res.data.data;
@@ -553,15 +553,11 @@ function AdminAddStudent() {
           </div>
         </div>
 
-        {/* ========================================================================= */}
-        {/* STEP 1: STUDENT DETAILS FORM */}
-        {/* ========================================================================= */}
         {currentStep === 1 && (
           <form
             onSubmit={handleStep1Submit}
             className="space-y-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
           >
-            {/* Section 1: Personal Information */}
             <div className="space-y-6">
               <div className="border-b border-slate-100 pb-4">
                 <div className="flex items-center gap-2 text-slate-900">

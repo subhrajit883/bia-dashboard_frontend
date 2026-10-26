@@ -1575,10 +1575,7 @@ function AdminEditStudent() {
                         </form>
                     </div>
                 )}
-
-                {/* ========================================================================= */}
-                {/* STEP 3: UPDATE CONFIRMATION & SUMMARY */}
-                {/* ========================================================================= */}
+                
                 {currentStep === 3 && (
                     <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm text-center space-y-6">
                         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 shadow-lg shadow-emerald-500/20">

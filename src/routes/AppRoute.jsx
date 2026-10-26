@@ -41,6 +41,9 @@ import CounsellorEmail from "../pages/CounsellorPages/CounsellorEmail";
 import CounsellorSendEmail from "../pages/CounsellorPages/CounsellorSendEmail";
 import AdminSendEmail from "../pages/AdminPages/AdminSendEmail";
 import AdminEmail from "../pages/AdminPages/AdminEmail";
+import CounsellorProfile from "../pages/CounsellorPages/CounsellorProfile";
+import CounsellorForgotPassword from "../pages/CounsellorPages/CounsellorForgotPassword";
+import CounsellorResetPassword from "../pages/CounsellorPages/CounsellorResetPassword";
 
 const AppRoute = () => {
     return (
@@ -99,6 +102,24 @@ const AppRoute = () => {
                 />
 
                 <Route
+                    path="/counsellor/forgot-password"
+                    element={<CounsellorForgotPassword />}
+                />
+                <Route
+                    path="/forgot-password"
+                    element={<CounsellorForgotPassword />}
+                />
+
+                <Route
+                    path="/reset-password"
+                    element={<CounsellorResetPassword />}
+                />
+                <Route
+                    path="/counsellor/reset-password"
+                    element={<CounsellorResetPassword />}
+                />
+
+                <Route
                     element={
                         <CounsellorProtectedRoute>
                             <CounsellorLayout />
@@ -121,6 +142,8 @@ const AppRoute = () => {
                     <Route path="/counsellor/students" element={<CounsellorStudent />} />
                     <Route path="/counsellor/emailtemplate" element={<CounsellorEmail />} />
                     <Route path="/counsellor/emails" element={<CounsellorSendEmail />} />
+                    <Route path="/counsellor/profile" element={<CounsellorProfile />} />
+                    <Route path="/counsellor/profile/:id" element={<CounsellorProfile />} />
                 </Route>
 
             </Routes>

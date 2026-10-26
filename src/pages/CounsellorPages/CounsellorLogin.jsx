@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   FiMail,
   FiLock,
@@ -205,6 +205,13 @@ function CounsellorLogin() {
                   >
                     Password
                   </label>
+
+                  <Link
+                    to="/counsellor/forgot-password"
+                    className="text-xs font-semibold text-blue-600 transition hover:text-blue-700 hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
                 </div>
 
                 <div className="group relative">

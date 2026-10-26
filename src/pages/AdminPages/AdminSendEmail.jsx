@@ -220,8 +220,8 @@ function AdminSendEmail() {
                     <div>
                         <div className="flex items-center gap-2">
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-700">
-                                <Sparkles className="h-3.5 w-3.5" />
-                                Counsellor Workspace
+                                {/* <Sparkles className="h-3.5 w-3.5" /> */}
+                                Admin Workspace
                             </span>
                             <span className="text-xs text-slate-400">•</span>
                             <span className="text-xs font-medium text-slate-500">
@@ -258,10 +258,7 @@ function AdminSendEmail() {
                     </div>
                 </div>
 
-                {/* ========================================================================= */}
-                {/* 2. STATS SUMMARY CARDS */}
-                {/* ========================================================================= */}
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {/* <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs">
                         <div className="flex items-center justify-between">
                             <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -329,7 +326,7 @@ function AdminSendEmail() {
                             Individual email inboxes
                         </p>
                     </div>
-                </div>
+                </div> */}
 
                 {/* ========================================================================= */}
                 {/* 3. SEARCH & FILTERS CONTAINER */}
@@ -505,6 +502,7 @@ function AdminSendEmail() {
                     leads={leads}
                     students={students}
                     loadingRecipients={loadingRecipients}
+                    tokenStorageKey="adminToken"
                 />
 
                 <EmailLogDetailsModal

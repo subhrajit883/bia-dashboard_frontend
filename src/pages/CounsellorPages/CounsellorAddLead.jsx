@@ -21,6 +21,7 @@ import {
     CheckSquare,
     Square,
     Users,
+    Info,
 } from "lucide-react";
 import {
     sourcesUrl,
@@ -103,7 +104,7 @@ function CounsellorAddLead() {
                         .get(courseUrl.courses, { headers })
                         .catch(() => ({ data: { data: [] } })),
                     axios
-                        .get(counsellorUrl.counsellorAll)
+                        .get(counsellorUrl.counsellorActive)
                         .catch(() => ({ data: { data: [] } })),
                 ]);
 
@@ -386,7 +387,7 @@ function CounsellorAddLead() {
                                     Status <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="relative">
-                                    <Sparkles className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                    <Info className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-slate-400" />
                                     <select
                                         id="candidateStatus"
                                         name="candidateStatus"

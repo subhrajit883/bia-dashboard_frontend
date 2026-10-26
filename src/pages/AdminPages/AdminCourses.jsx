@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { adminApi } from "../../config/axios";
 import { adminUrl } from "../../config/config";
+import { SquarePen, Trash2 } from "lucide-react";
 
 const fetchCourses = async () => {
   const response = await adminApi.get(adminUrl.courses);
@@ -56,8 +57,8 @@ function AdminCourses() {
         if (isMounted) {
           toast.error(
             error.response?.data?.message ||
-              error.message ||
-              "Unable to load courses."
+            error.message ||
+            "Unable to load courses."
           );
         }
       } finally {
@@ -116,14 +117,14 @@ function AdminCourses() {
       if (response.data?.success === false) {
         toast.error(
           response.data.message ||
-            `Unable to ${editingCourse ? "update" : "create"} course.`
+          `Unable to ${editingCourse ? "update" : "create"} course.`
         );
         return;
       }
 
       toast.success(
         response.data?.message ||
-          `Course ${editingCourse ? "updated" : "created"} successfully.`
+        `Course ${editingCourse ? "updated" : "created"} successfully.`
       );
       resetForm();
       await loadCourses();
@@ -179,15 +180,13 @@ function AdminCourses() {
         `${adminUrl.courses}/${course._id}`
       );
 
-      if (response.data?.success === false) 
-        {
+      if (response.data?.success === false) {
         toast.error(response.data.message || "Unable to delete course.");
         return;
       }
 
       toast.success(response.data?.message || "Course deleted successfully.");
-      if (editingCourse?._id === course._id) 
-        {
+      if (editingCourse?._id === course._id) {
         resetForm();
       }
       await loadCourses();
@@ -399,11 +398,10 @@ function AdminCourses() {
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-                            course.isActive
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "bg-slate-100 text-slate-600"
-                          }`}
+                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${course.isActive
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-slate-100 text-slate-600"
+                            }`}
                         >
                           {course.isActive ? "Active" : "Inactive"}
                         </span>
@@ -427,14 +425,14 @@ function AdminCourses() {
                             onClick={() => handleEdit(course)}
                             className="rounded-lg border border-blue-200 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-50"
                           >
-                            Edit
+                            <SquarePen />
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDelete(course)}
                             className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50"
                           >
-                            Delete
+                            <Trash2 />
                           </button>
                         </div>
                       </td>

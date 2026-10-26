@@ -520,7 +520,7 @@ function CounsellorLeads() {
                 </div>
 
                 {/* Stats Summary Cards */}
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {/* <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
                         <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                             Total Leads
@@ -556,7 +556,7 @@ function CounsellorLeads() {
                             {stats.converted}
                         </p>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Search & Filter Toolbar */}
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs space-y-4">
@@ -822,7 +822,7 @@ function CounsellorLeads() {
                                         <th className="px-5 py-4">Interested Course(s)</th>
                                         <th className="px-5 py-4">Assigned Counsellor</th>
                                         <th className="px-5 py-4">Status</th>
-                                        <th className="px-5 py-4">Conversion</th>
+                                        {/* <th className="px-5 py-4">Conversion</th> */}
                                         <th className="px-5 py-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
@@ -940,7 +940,7 @@ function CounsellorLeads() {
                                                 </td>
 
                                                 {/* Conversion Status */}
-                                                <td className="px-5 py-4">
+                                                {/* <td className="px-5 py-4">
                                                     {isConverted ? (
                                                         <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 border border-purple-200 px-2.5 py-1 text-[11px] font-bold text-purple-700">
                                                             <CheckCircle2 className="h-3 w-3" />
@@ -953,7 +953,7 @@ function CounsellorLeads() {
                                                                 : "Not Requested"}
                                                         </span>
                                                     )}
-                                                </td>
+                                                </td> */}
 
                                                 {/* Actions */}
                                                 <td className="px-5 py-4 text-right">
@@ -1087,11 +1087,10 @@ function CounsellorLeads() {
                                             type="button"
                                             onClick={() => setPage(p)}
                                             disabled={loading}
-                                            className={`h-7 min-w-7 cursor-pointer rounded-lg px-2 text-xs font-bold transition ${
-                                                p === page
-                                                    ? "bg-blue-600 text-white shadow-xs"
-                                                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
-                                            }`}
+                                            className={`h-7 min-w-7 cursor-pointer rounded-lg px-2 text-xs font-bold transition ${p === page
+                                                ? "bg-blue-600 text-white shadow-xs"
+                                                : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+                                                }`}
                                         >
                                             {p}
                                         </button>

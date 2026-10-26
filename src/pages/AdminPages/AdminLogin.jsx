@@ -83,7 +83,7 @@ function AdminLogin() {
           <div className="pointer-events-none absolute bottom-28 left-12 h-32 w-32 rounded-full bg-blue-400/10 blur-2xl" />
 
           <div className="relative z-10 w-full">
-            <div className="flex w-full items-center justify-center">
+            <div className="flex w-full items-center justify-center bg-white">
               <img
                 src={logo}
                 alt="Bi Academy Logo"
@@ -125,10 +125,10 @@ function AdminLogin() {
 
         <div className="flex items-center justify-center px-6 py-10 sm:px-10 md:px-12 lg:px-14">
           <div className="w-full max-w-md">
-            <div className="mb-9 flex justify-center md:hidden ">
+            <div className="mb-9 flex justify-center md:hidden bg-white">
               <img
                 src={logo}
-                alt="Bi Talents Logo"
+                alt="BIA Logo"
                 className="h-24 w-auto max-w-full object-contain"
               />
             </div>

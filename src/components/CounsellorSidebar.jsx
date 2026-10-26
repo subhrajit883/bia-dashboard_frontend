@@ -18,7 +18,7 @@ import logo from "../assets/bia.png";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { FaHeart, FaUserPlus } from "react-icons/fa";
 import { PiStudentBold } from "react-icons/pi";
-import { Mail, Send } from "lucide-react";
+import { Mail, Send, User } from "lucide-react";
 
 const NAV_ITEMS = [
     // { label: "Dashboard", icon: FiLayout, to: "/counsellor/dashboard" },
@@ -28,6 +28,7 @@ const NAV_ITEMS = [
     { label: "All Students", icon: PiStudentBold, to: "/counsellor/students" },
     { label: "Email Template", icon: Mail, to: "/counsellor/emailtemplate" },
     { label: "Send Emails", icon: Send, to: "/counsellor/emails" },
+    { label: "My Profile", icon: User, to: "/counsellor/profile" },
     // { label: "Settings", icon: FiSettings, to: "/admin/settings" },
 ];
 

@@ -1312,10 +1312,10 @@ function AdminCounsellorPerformance() {
 
                                     {/* Conversion Rate */}
                                     <div className="rounded-xl bg-purple-50 p-2 print:p-1.5 border border-purple-200 col-span-2 sm:col-span-1 print:col-span-1">
-                                        <span className="text-[9px] uppercase tracking-wider text-purple-700 block font-semibold">
+                                        <span className="text-[9px] uppercase tracking-wider text-red-700 block font-semibold">
                                             Conversion Rate
                                         </span>
-                                        <span className="text-lg font-black text-purple-800 block mt-0.5 print:text-base">
+                                        <span className="text-lg font-black text-red-800 block mt-0.5 print:text-base">
                                             {executiveOverallRate}%
                                         </span>
                                     </div>
@@ -1360,7 +1360,7 @@ function AdminCounsellorPerformance() {
                                                     {/* Card Header: Counsellor Profile & Conversion Badge */}
                                                     <div className="flex items-start justify-between gap-3 border-b border-slate-100 print:border-slate-200 pb-3">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-sm font-bold text-white shadow-xs">
+                                                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-500 to-blue-700 text-sm font-bold text-white shadow-xs">
                                                                 {getInitials(item.counsellorName)}
                                                             </div>
                                                             <div className="min-w-0">

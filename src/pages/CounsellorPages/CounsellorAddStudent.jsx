@@ -98,7 +98,7 @@ function CounsellorAddStudent() {
 
         // 2. Fetch counsellors
         const counsellorsPromise = axios
-          .get(`${counsellorUrl.counsellorAll}`, { headers })
+          .get(`${counsellorUrl.counsellorActive}`, { headers })
           .then((res) => {
             if (res.data?.success && Array.isArray(res.data.data)) {
               return res.data.data;
