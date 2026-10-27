@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
     FiUsers,
     FiGrid,
@@ -35,9 +35,11 @@ const NAV_ITEMS = [
     // { label: "Settings", icon: FiSettings, to: "/admin/settings" },
 ];
 
+
+
 const AdminSidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
-
+    const navigate = useNavigate();
     const closeSidebar = () => {
         setIsOpen(false);
     };
@@ -97,7 +99,7 @@ const AdminSidebar = () => {
                         />
                     </NavLink>
                 </div>
-               
+
                 <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
                     {NAV_ITEMS.map((item) => {
                         const Icon = item.icon;
@@ -131,7 +133,32 @@ const AdminSidebar = () => {
                         );
                     })}
                 </nav>
+                <div className="px-4 py-4 mt-auto">
 
+                    <button
+                        type="button"
+                        className="
+                            flex items-center gap-3
+                            w-full
+                            px-4 py-3
+                            rounded-xl
+                            text-sm font-medium
+                            text-slate-300
+                            hover:bg-white/5
+                            hover:text-white
+                            transition-all duration-200
+                            cursor-pointer
+                        "
+                        onClick={() => navigate("/admin/settings")}
+                    >
+                        <FiSettings
+                            size={19}
+                            className="shrink-0"
+                        />
+
+                        <span>Settings</span>
+                    </button>
+                </div>
                 <div className="px-4 py-4 mt-auto">
                     <div className="h-px bg-white/10 mb-4" />
 

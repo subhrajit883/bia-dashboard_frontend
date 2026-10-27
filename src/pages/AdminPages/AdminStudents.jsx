@@ -66,7 +66,7 @@ function AdminStudents() {
                         .get(courseUrl.courses, { headers })
                         .catch(() => ({ data: { data: [] } })),
                     axios
-                        .get(counsellorUrl.counsellorAll)
+                        .get(counsellorUrl.counsellorActive)
                         .catch(() => ({ data: { data: [] } })),
                 ]);
 
@@ -326,8 +326,8 @@ function AdminStudents() {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-700">
-                                <Sparkles className="h-3.5 w-3.5" />
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-600">
+
                                 Admin Workspace
                             </span>
                             <span className="text-xs text-slate-400">•</span>
@@ -997,8 +997,8 @@ function AdminStudents() {
                                             onClick={() => setPage(p)}
                                             disabled={loading}
                                             className={`h-7 min-w-7 cursor-pointer rounded-lg px-2 text-xs font-bold transition ${p === page
-                                                    ? "bg-emerald-600 text-white shadow-xs"
-                                                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+                                                ? "bg-emerald-600 text-white shadow-xs"
+                                                : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
                                                 }`}
                                         >
                                             {p}

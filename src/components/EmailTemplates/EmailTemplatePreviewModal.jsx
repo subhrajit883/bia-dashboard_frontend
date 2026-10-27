@@ -95,7 +95,7 @@ function EmailTemplatePreviewModal({ template, onClose, onEdit, onCopy, copiedTa
                                 To:
                             </span>
                             <span className="text-slate-600">
-                                Subhrajit Sharma &lt;subhra.candidate@example.com&gt;
+                                Subhrajit Mukherjee &lt;subhrajit.mukherjee@gmail.com&gt;
                             </span>
                         </div>
                     </div>
@@ -138,7 +138,7 @@ function EmailTemplatePreviewModal({ template, onClose, onEdit, onCopy, copiedTa
 
                 {/* Modal Actions */}
                 <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <button
+                    {/* <button
                         type="button"
                         onClick={() => onCopy(template.body, "HTML Code")}
                         className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
@@ -149,7 +149,7 @@ function EmailTemplatePreviewModal({ template, onClose, onEdit, onCopy, copiedTa
                             <Copy className="h-3.5 w-3.5" />
                         )}
                         Copy HTML
-                    </button>
+                    </button> */}
 
                     <div className="flex items-center gap-2">
                         <button

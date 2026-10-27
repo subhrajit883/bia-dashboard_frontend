@@ -68,6 +68,16 @@ function AdminLogin() {
   };
 
   useEffect(() => {
+    try {
+      const expiredMsg = sessionStorage.getItem("auth_session_expired");
+      if (expiredMsg) {
+        sessionStorage.removeItem("auth_session_expired");
+        toast.error(expiredMsg);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
     if (localStorage.getItem("adminToken")) {
       navigate("/admin/leads", { replace: true });
     }
@@ -83,7 +93,7 @@ function AdminLogin() {
           <div className="pointer-events-none absolute bottom-28 left-12 h-32 w-32 rounded-full bg-blue-400/10 blur-2xl" />
 
           <div className="relative z-10 w-full">
-            <div className="flex w-full items-center justify-center bg-white">
+            <div className="flex w-full rounded-2xl items-center justify-center bg-white">
               <img
                 src={logo}
                 alt="Bi Academy Logo"

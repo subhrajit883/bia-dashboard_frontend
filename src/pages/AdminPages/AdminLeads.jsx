@@ -30,6 +30,7 @@ import {
     ChevronsLeft,
     ChevronsRight,
 } from "lucide-react";
+import ExportLeadsButton from "../../components/ExportLeadsButton";
 import {
     leadUrl,
     sourcesUrl,
@@ -120,7 +121,7 @@ function AdminLeads() {
                         .get(courseUrl.courses, { headers })
                         .catch(() => ({ data: { data: [] } })),
                     axios
-                        .get(counsellorUrl.counsellorAll)
+                        .get(counsellorUrl.counsellorActive)
                         .catch(() => ({ data: { data: [] } })),
                 ]);
 
@@ -459,6 +460,32 @@ function AdminLeads() {
         conversionStatus,
     ]);
 
+    // Active filters query object passed to Excel export
+    const activeFilters = useMemo(
+        () => ({
+            search: debouncedSearch.trim(),
+            candidateType,
+            sourceName,
+            dateFrom,
+            dateTo,
+            courseName,
+            assignedCounsellorName,
+            status,
+            conversionStatus,
+        }),
+        [
+            debouncedSearch,
+            candidateType,
+            sourceName,
+            dateFrom,
+            dateTo,
+            courseName,
+            assignedCounsellorName,
+            status,
+            conversionStatus,
+        ]
+    );
+
     const formatDate = (isoString) => {
         if (!isoString) return "N/A";
         try {
@@ -481,7 +508,6 @@ function AdminLeads() {
                     <div>
                         <div className="flex items-center gap-2">
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-700">
-                                <Sparkles className="h-3.5 w-3.5" />
                                 Admin Workspace
                             </span>
                             <span className="text-xs text-slate-400">•</span>
@@ -498,6 +524,13 @@ function AdminLeads() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
+                        <ExportLeadsButton
+                            filters={activeFilters}
+                            leads={leads}
+                            totalLeadsCount={totalLeadsCount}
+                            disabled={loading}
+                        />
+
                         <button
                             type="button"
                             onClick={() => loadLeads(true)}
@@ -1081,11 +1114,10 @@ function AdminLeads() {
                                             type="button"
                                             onClick={() => setPage(p)}
                                             disabled={loading}
-                                            className={`h-7 min-w-7 cursor-pointer rounded-lg px-2 text-xs font-bold transition ${
-                                                p === page
-                                                    ? "bg-blue-600 text-white shadow-xs"
-                                                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
-                                            }`}
+                                            className={`h-7 min-w-7 cursor-pointer rounded-lg px-2 text-xs font-bold transition ${p === page
+                                                ? "bg-blue-600 text-white shadow-xs"
+                                                : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+                                                }`}
                                         >
                                             {p}
                                         </button>

@@ -120,7 +120,7 @@ function CounsellorLeads() {
                         .get(courseUrl.courses, { headers })
                         .catch(() => ({ data: { data: [] } })),
                     axios
-                        .get(counsellorUrl.counsellorAll)
+                        .get(counsellorUrl.counsellorActive)
                         .catch(() => ({ data: { data: [] } })),
                 ]);
 
@@ -481,8 +481,8 @@ function CounsellorLeads() {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-700">
-                                <Sparkles className="h-3.5 w-3.5" />
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-600">
+
                                 Counsellor Workspace
                             </span>
                             <span className="text-xs text-slate-400">•</span>

@@ -29,7 +29,6 @@ import AdminLeadDetails from "../pages/AdminPages/AdminLeadDetails";
 import AdminStudents from "../pages/AdminPages/AdminStudents";
 import AdminCounsellor from "../pages/AdminPages/AdminCounsellor";
 import AdminCounsellorPerformance from "../pages/AdminPages/AdminCounsellorPerformance";
-import AdminEmails from "../pages/AdminPages/AdminEmails";
 import CounsellorAddLead from "../pages/CounsellorPages/CounsellorAddLead";
 import CounsellorLeads from "../pages/CounsellorPages/CounsellorLeads";
 import CounsellorLeadDetails from "../pages/CounsellorPages/CounsellorLeadDetails";
@@ -44,6 +43,7 @@ import AdminEmail from "../pages/AdminPages/AdminEmail";
 import CounsellorProfile from "../pages/CounsellorPages/CounsellorProfile";
 import CounsellorForgotPassword from "../pages/CounsellorPages/CounsellorForgotPassword";
 import CounsellorResetPassword from "../pages/CounsellorPages/CounsellorResetPassword";
+import AdminSettings from "../pages/AdminPages/AdminSettings";
 
 const AppRoute = () => {
     return (
@@ -83,12 +83,13 @@ const AppRoute = () => {
                     <Route path="/admin/editlead/:id" element={<AdminEditLead />} />
                     <Route path="/admin/leads/edit/:id" element={<AdminEditLead />} />
                     <Route path="/admin/leads" element={<AdminLeads />} />
-                    <Route path="/admin/emails" element={<AdminEmails />} />
+                    {/* <Route path="/admin/emails" element={<AdminEmails />} /> */}
                     <Route path="/admin/leads/:id" element={<AdminLeadDetails />} />
                     <Route path="/admin/counsellors" element={<AdminCounsellor />} />
                     <Route path="/admin/counsellors-performance" element={<AdminCounsellorPerformance />} />
                     <Route path="/admin/emailtemplate" element={<AdminEmail />} />
                     <Route path="/admin/sendemail" element={<AdminSendEmail />} />
+                    <Route path="/admin/settings" element={<AdminSettings />} />
                 </Route>
 
                 <Route

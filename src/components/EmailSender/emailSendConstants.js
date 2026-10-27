@@ -73,11 +73,11 @@ export const formatDate = (isoString) => {
 export const renderWithSampleData = (text) => {
     if (!text) return "";
     return text
-        .replace(/\{\{\s*name\s*\}\}/gi, "Subhrajit Sharma")
-        .replace(/\{\{\s*course\s*\}\}/gi, "Data Science & AI Masterclass")
-        .replace(/\{\{\s*counsellorName\s*\}\}/gi, "Dr. Anita Roy")
+        .replace(/\{\{\s*name\s*\}\}/gi, "Subhrajit Mukherjee")
+        .replace(/\{\{\s*course\s*\}\}/gi, "Film Acting")
+        .replace(/\{\{\s*counsellorName\s*\}\}/gi, "Counsellor2")
         .replace(/\{\{\s*counsellorPhone\s*\}\}/gi, "+91 98765 43210")
-        .replace(/\{\{\s*counsellorEmail\s*\}\}/gi, "anita.roy@biacademy.com")
+        .replace(/\{\{\s*counsellorEmail\s*\}\}/gi, "counsellor2@biacademy.com")
         .replace(/\{\{\s*phone\s*\}\}/gi, "+91 98765 43210")
         .replace(/\{\{\s*email\s*\}\}/gi, "candidate@example.com");
 };

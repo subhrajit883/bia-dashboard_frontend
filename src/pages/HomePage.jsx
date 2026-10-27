@@ -90,11 +90,11 @@ function HomePage() {
 
 
               {/* Main heading */}
-              <h1 className="text-4xl font-extrabold leading-[1.15] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+              <h1 className="text-4xl font-bold leading-[1.15] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
                 Welcome to
                 <br />
 
-                <span className="bg-linear-to-r from-blue-600 via-blue-700 to-indigo-700 bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-blue-500 via-blue-600 to-blue-700 bg-clip-text text-transparent">
                   Being Iban Academy
                 </span>
               </h1>
@@ -107,7 +107,7 @@ function HomePage() {
                 <button
                   type="button"
                   onClick={() => navigate("/counsellor/login")}
-                  className="group flex min-h-[76px] items-center justify-between gap-3 rounded-2xl bg-blue-600 px-5 py-4 text-left text-white shadow-xl shadow-blue-600/20 transition duration-200 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-blue-600/30 focus:outline-none focus:ring-4 focus:ring-blue-500/25"
+                  className="group flex min-h-[76px] cursor-pointer items-center justify-between gap-3 rounded-2xl bg-blue-600 px-5 py-4 text-left text-white shadow-xl shadow-blue-600/20 transition duration-200 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-blue-600/30 focus:outline-none focus:ring-4 focus:ring-blue-500/25"
                 >
                   <span className="flex items-center gap-3">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15">
@@ -134,7 +134,7 @@ function HomePage() {
                 <button
                   type="button"
                   onClick={() => navigate("/admin/login")}
-                  className="group flex min-h-[76px] items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-2 text-left shadow-lg shadow-slate-900/5 transition duration-200 hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-500/15"
+                  className="group flex min-h-[76px] cursor-pointer items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-2 text-left shadow-lg shadow-slate-900/5 transition duration-200 hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-500/15"
                 >
                   <span className="flex items-center gap-3">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700 transition group-hover:bg-blue-100">

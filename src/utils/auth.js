@@ -5,7 +5,12 @@ export const TOKEN_KEY = "token";
 export const USER_KEY = "user";
 export const ROLE_KEY = "role";
 
+export const ADMIN_TOKEN_KEY = "adminToken";
+export const ADMIN_USER_KEY = "adminUser";
+export const ADMIN_ROLE_KEY = "adminRole";
+
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
+export const getAdminToken = () => localStorage.getItem(ADMIN_TOKEN_KEY);
 
 export const getUser = () => {
   const savedUser = localStorage.getItem(USER_KEY);
@@ -42,10 +47,20 @@ export const saveAuthData = (payload = {}) => {
   return token;
 };
 
-export const clearAuthData = () => {
+export const clearCounsellorAuthData = () => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
   localStorage.removeItem(ROLE_KEY);
+};
+
+export const clearAdminAuthData = () => {
+  localStorage.removeItem(ADMIN_TOKEN_KEY);
+  localStorage.removeItem(ADMIN_USER_KEY);
+  localStorage.removeItem(ADMIN_ROLE_KEY);
+};
+
+export const clearAuthData = () => {
+  clearCounsellorAuthData();
 };
 
 export const isAuthenticated = () => Boolean(getToken());

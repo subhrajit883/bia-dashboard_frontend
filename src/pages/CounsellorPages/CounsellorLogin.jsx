@@ -61,6 +61,16 @@ function CounsellorLogin() {
   };
 
   useEffect(() => {
+    try {
+      const expiredMsg = sessionStorage.getItem("auth_session_expired");
+      if (expiredMsg) {
+        sessionStorage.removeItem("auth_session_expired");
+        toast.error(expiredMsg);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
     if (isAuthenticated()) {
       navigate("/counsellor/leads", { replace: true });
     }

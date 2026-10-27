@@ -224,7 +224,7 @@ function AdminCounsellorPerformance() {
                 const headers = adminToken ? { Authorization: `Bearer ${adminToken}` } : {};
 
                 const [cnlRes, crsRes] = await Promise.all([
-                    axios.get(counsellorUrl.counsellorAll, { headers }).catch(() => ({ data: { data: [] } })),
+                    axios.get(counsellorUrl.counsellorActive, { headers }).catch(() => ({ data: { data: [] } })),
                     axios.get(courseUrl.courses, { headers }).catch(() => ({ data: { data: [] } })),
                 ]);
 
