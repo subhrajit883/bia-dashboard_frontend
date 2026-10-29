@@ -680,10 +680,10 @@ function AdminEditStudent() {
                         >
                             <div
                                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold text-sm transition-all ${currentStep > 1
-                                        ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
-                                        : currentStep === 1
-                                            ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 ring-4 ring-blue-100"
-                                            : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
+                                    ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                                    : currentStep === 1
+                                        ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 ring-4 ring-blue-100"
+                                        : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
                                     }`}
                             >
                                 {currentStep > 1 ? (
@@ -716,10 +716,10 @@ function AdminEditStudent() {
                         >
                             <div
                                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold text-sm transition-all ${currentStep > 2
-                                        ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
-                                        : currentStep === 2
-                                            ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 ring-4 ring-blue-100"
-                                            : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
+                                    ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                                    : currentStep === 2
+                                        ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 ring-4 ring-blue-100"
+                                        : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
                                     }`}
                             >
                                 {currentStep > 2 ? (
@@ -749,8 +749,8 @@ function AdminEditStudent() {
                         <div className="flex items-center">
                             <div
                                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold text-sm transition-all ${currentStep === 3
-                                        ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20 ring-4 ring-emerald-100"
-                                        : "bg-slate-100 text-slate-400"
+                                    ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20 ring-4 ring-emerald-100"
+                                    : "bg-slate-100 text-slate-400"
                                     }`}
                             >
                                 {currentStep === 3 ? (
@@ -1017,8 +1017,8 @@ function AdminEditStudent() {
                                                     setFormData((prev) => ({ ...prev, gender: g.value }))
                                                 }
                                                 className={`flex items-center justify-center rounded-xl border py-3 text-sm font-semibold transition-all cursor-pointer ${formData.gender === g.value
-                                                        ? "border-blue-600 bg-blue-50/60 text-blue-700 ring-2 ring-blue-500/20"
-                                                        : "border-slate-200 bg-slate-50/70 text-slate-700 hover:bg-slate-100"
+                                                    ? "border-blue-600 bg-blue-50/60 text-blue-700 ring-2 ring-blue-500/20"
+                                                    : "border-slate-200 bg-slate-50/70 text-slate-700 hover:bg-slate-100"
                                                     }`}
                                             >
                                                 {g.label}
@@ -1183,8 +1183,8 @@ function AdminEditStudent() {
                                                     key={course._id}
                                                     onClick={() => toggleCourse(course._id)}
                                                     className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-all ${isSelected
-                                                            ? "border-blue-600 bg-blue-50/70 shadow-xs ring-2 ring-blue-500/20"
-                                                            : "border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100/60"
+                                                        ? "border-blue-600 bg-blue-50/70 shadow-xs ring-2 ring-blue-500/20"
+                                                        : "border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100/60"
                                                         }`}
                                                 >
                                                     <div className="mt-0.5 shrink-0 text-blue-600">
@@ -1417,10 +1417,7 @@ function AdminEditStudent() {
                                     </div>
                                     <p className="mt-1 text-xs text-slate-500">
                                         Upload verification documents (e.g. Aadhar card, Voter card,
-                                        certificates). Endpoint:{" "}
-                                        <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-blue-700">
-                                            /api/students/{id}/documents
-                                        </code>
+                                        certificates
                                     </p>
                                 </div>
 
@@ -1575,7 +1572,7 @@ function AdminEditStudent() {
                         </form>
                     </div>
                 )}
-                
+
                 {currentStep === 3 && (
                     <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm text-center space-y-6">
                         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 shadow-lg shadow-emerald-500/20">

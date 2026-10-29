@@ -310,7 +310,7 @@ function AdminCounsellor() {
                         </button>
 
                         <Link
-                            to="/admin/counsellors/performance"
+                            to="/admin/counsellors-performance"
                             className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-blue-600/30 transition hover:bg-blue-700 active:scale-95"
                         >
                             <BarChart3 className="h-4 w-4" />

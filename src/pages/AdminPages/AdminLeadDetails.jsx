@@ -28,6 +28,24 @@ const PRESET_REMARKS = [
     "💳 Discussed admission procedure, installments & seat reservation.",
 ];
 
+const formatToLocalDateTime = (date) => {
+    const d = date instanceof Date ? date : new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+const getTodayStartDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}T00:00`;
+};
+
 function AdminLeadDetails() {
     const { id } = useParams();
     const location = useLocation();
@@ -44,8 +62,8 @@ function AdminLeadDetails() {
         const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
         return {
             description: "",
-            date: now.toISOString().slice(0, 16),
-            nextCallDate: nextWeek.toISOString().slice(0, 16),
+            date: formatToLocalDateTime(now),
+            nextCallDate: formatToLocalDateTime(nextWeek),
         };
     });
     const [submittingFollowUp, setSubmittingFollowUp] = useState(false);
@@ -139,7 +157,7 @@ function AdminLeadDetails() {
         const nextDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
         setFollowUpData((prev) => ({
             ...prev,
-            nextCallDate: nextDate.toISOString().slice(0, 16),
+            nextCallDate: formatToLocalDateTime(nextDate),
         }));
     };
 
@@ -152,6 +170,20 @@ function AdminLeadDetails() {
         }
         if (!followUpData.date) {
             toast.error("Please select the call date & time.");
+            return;
+        }
+
+        const minDateTime = getTodayStartDateTime();
+        if (followUpData.date < minDateTime) {
+            toast.error("Call Date & Time cannot be a past date.");
+            return;
+        }
+        if (followUpData.nextCallDate && followUpData.nextCallDate < minDateTime) {
+            toast.error("Next Follow-up Date cannot be a past date.");
+            return;
+        }
+        if (followUpData.nextCallDate && followUpData.nextCallDate < followUpData.date) {
+            toast.error("Next Follow-up Date cannot be earlier than Call Date & Time.");
             return;
         }
 
@@ -191,8 +223,8 @@ function AdminLeadDetails() {
             const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
             setFollowUpData({
                 description: "",
-                date: now.toISOString().slice(0, 16),
-                nextCallDate: nextWeek.toISOString().slice(0, 16),
+                date: formatToLocalDateTime(now),
+                nextCallDate: formatToLocalDateTime(nextWeek),
             });
             setShowFollowUpModal(false);
 
@@ -1234,13 +1266,19 @@ function AdminLeadDetails() {
                                         <input
                                             type="datetime-local"
                                             required
+                                            min={getTodayStartDateTime()}
                                             value={followUpData.date}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val && val < getTodayStartDateTime()) {
+                                                    toast.error("Call Date & Time cannot be a past date.");
+                                                    return;
+                                                }
                                                 setFollowUpData((prev) => ({
                                                     ...prev,
-                                                    date: e.target.value,
-                                                }))
-                                            }
+                                                    date: val,
+                                                }));
+                                            }}
                                             className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                                         />
                                     </div>
@@ -1280,13 +1318,19 @@ function AdminLeadDetails() {
                                         </div>
                                         <input
                                             type="datetime-local"
+                                            min={followUpData.date || getTodayStartDateTime()}
                                             value={followUpData.nextCallDate}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val && val < getTodayStartDateTime()) {
+                                                    toast.error("Next Follow-up Date cannot be a past date.");
+                                                    return;
+                                                }
                                                 setFollowUpData((prev) => ({
                                                     ...prev,
-                                                    nextCallDate: e.target.value,
-                                                }))
-                                            }
+                                                    nextCallDate: val,
+                                                }));
+                                            }}
                                             className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                                         />
                                     </div>
@@ -1439,9 +1483,6 @@ function AdminLeadDetails() {
                     </div>
                 </div>
 
-                {/* ========================================================================= */}
-                {/* MODAL 1: ADD FOLLOW-UP MODAL (Alternative quick-access modal) */}
-                {/* ========================================================================= */}
                 {showFollowUpModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-xs">
                         <div className="relative w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl sm:p-7">
@@ -1495,13 +1536,19 @@ function AdminLeadDetails() {
                                         <input
                                             type="datetime-local"
                                             required
+                                            min={getTodayStartDateTime()}
                                             value={followUpData.date}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val && val < getTodayStartDateTime()) {
+                                                    toast.error("Call Date & Time cannot be a past date.");
+                                                    return;
+                                                }
                                                 setFollowUpData((prev) => ({
                                                     ...prev,
-                                                    date: e.target.value,
-                                                }))
-                                            }
+                                                    date: val,
+                                                }));
+                                            }}
                                             className="w-full rounded-xl border border-slate-200 bg-slate-50/70 p-2.5 text-xs text-slate-800 outline-none"
                                         />
                                     </div>
@@ -1512,13 +1559,20 @@ function AdminLeadDetails() {
                                         </label>
                                         <input
                                             type="datetime-local"
+                                            min={followUpData.date || getTodayStartDateTime()}
                                             value={followUpData.nextCallDate}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val && val < getTodayStartDateTime()) {
+                                                    toast.error("Next Follow-up Date cannot be a past date.");
+                                                    return;
+                                                }
                                                 setFollowUpData((prev) => ({
                                                     ...prev,
-                                                    nextCallDate: e.target.value,
-                                                }))
-                                            }
+                                                    nextCallDate: val,
+                                                }));
+                                            }}
+
                                             className="w-full rounded-xl border border-slate-200 bg-slate-50/70 p-2.5 text-xs text-slate-800 outline-none"
                                         />
                                     </div>

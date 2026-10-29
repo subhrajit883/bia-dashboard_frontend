@@ -229,7 +229,7 @@ function HomePage() {
                 href="https://beingibandigital.in"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-semibold text-blue-600 transition hover:text-blue-800"
+                className="font-semibold text-amber-700 transition hover:text-amber-900"
               >
                 Being Iban Digital
               </a>

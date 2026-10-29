@@ -598,7 +598,7 @@ function CounsellorAddStudent() {
                       required
                       value={formData.name}
                       onChange={handleChange}
-                      placeholder="e.g. Amrita Sen"
+                      placeholder="Enter full name"
                       className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pr-4 pl-10 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                     />
                   </div>
@@ -620,7 +620,7 @@ function CounsellorAddStudent() {
                       type="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="e.g. amritasen@gmail.com"
+                      placeholder="Enter email"
                       className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pr-4 pl-10 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                     />
                   </div>
@@ -639,11 +639,11 @@ function CounsellorAddStudent() {
                     <input
                       id="student-phone"
                       name="phone"
-                      type="tel"
+                      type="number"
                       required
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="e.g. 9876543242"
+                      placeholder="Enter phone number"
                       className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pr-4 pl-10 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                     />
                   </div>
@@ -662,10 +662,10 @@ function CounsellorAddStudent() {
                     <input
                       id="student-alt-phone"
                       name="alternativePhone"
-                      type="tel"
+                      type="number"
                       value={formData.alternativePhone}
                       onChange={handleChange}
-                      placeholder="e.g. 9123456534"
+                      placeholder="Enter alternative phone"
                       className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pr-4 pl-10 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                     />
                   </div>
@@ -686,7 +686,7 @@ function CounsellorAddStudent() {
                       name="age"
                       type="number"
                       min="1"
-                      max="120"
+                      max="100"
                       required
                       value={formData.age}
                       onChange={handleChange}
@@ -740,7 +740,7 @@ function CounsellorAddStudent() {
                       required
                       value={formData.address}
                       onChange={handleChange}
-                      placeholder="e.g. Ballygunge, Kolkata, West Bengal"
+                      placeholder="Enter full address"
                       className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pr-4 pl-10 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                     />
                   </div>

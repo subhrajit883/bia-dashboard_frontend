@@ -91,8 +91,8 @@ function ExportLeadsButton({
 
             toast.error(
                 err.response?.data?.message ||
-                    err.message ||
-                    "Failed to export leads to Excel.",
+                err.message ||
+                "Failed to export leads to Excel.",
                 { id: toastId }
             );
         } finally {

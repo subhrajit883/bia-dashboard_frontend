@@ -29,6 +29,24 @@ const PRESET_REMARKS = [
     "💳 Discussed admission procedure, installments & seat reservation.",
 ];
 
+const formatToLocalDateTime = (date) => {
+    const d = date instanceof Date ? date : new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+const getTodayStartDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}T00:00`;
+};
+
 function CounsellorLeadDetails() {
     const { id } = useParams();
     const location = useLocation();
@@ -45,8 +63,8 @@ function CounsellorLeadDetails() {
         const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
         return {
             description: "",
-            date: now.toISOString().slice(0, 16),
-            nextCallDate: nextWeek.toISOString().slice(0, 16),
+            date: formatToLocalDateTime(now),
+            nextCallDate: formatToLocalDateTime(nextWeek),
         };
     });
     const [submittingFollowUp, setSubmittingFollowUp] = useState(false);
@@ -138,7 +156,7 @@ function CounsellorLeadDetails() {
         const nextDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
         setFollowUpData((prev) => ({
             ...prev,
-            nextCallDate: nextDate.toISOString().slice(0, 16),
+            nextCallDate: formatToLocalDateTime(nextDate),
         }));
     };
 
@@ -151,6 +169,20 @@ function CounsellorLeadDetails() {
         }
         if (!followUpData.date) {
             toast.error("Please select the call date & time.");
+            return;
+        }
+
+        const minDateTime = getTodayStartDateTime();
+        if (followUpData.date < minDateTime) {
+            toast.error("Call Date & Time cannot be a past date.");
+            return;
+        }
+        if (followUpData.nextCallDate && followUpData.nextCallDate < minDateTime) {
+            toast.error("Next Follow-up Date cannot be a past date.");
+            return;
+        }
+        if (followUpData.nextCallDate && followUpData.nextCallDate < followUpData.date) {
+            toast.error("Next Follow-up Date cannot be earlier than Call Date & Time.");
             return;
         }
 
@@ -189,8 +221,8 @@ function CounsellorLeadDetails() {
             const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
             setFollowUpData({
                 description: "",
-                date: now.toISOString().slice(0, 16),
-                nextCallDate: nextWeek.toISOString().slice(0, 16),
+                date: formatToLocalDateTime(now),
+                nextCallDate: formatToLocalDateTime(nextWeek),
             });
             setShowFollowUpModal(false);
 
@@ -1203,13 +1235,19 @@ function CounsellorLeadDetails() {
                                         <input
                                             type="datetime-local"
                                             required
+                                            min={getTodayStartDateTime()}
                                             value={followUpData.date}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val && val < getTodayStartDateTime()) {
+                                                    toast.error("Call Date & Time cannot be a past date.");
+                                                    return;
+                                                }
                                                 setFollowUpData((prev) => ({
                                                     ...prev,
-                                                    date: e.target.value,
-                                                }))
-                                            }
+                                                    date: val,
+                                                }));
+                                            }}
                                             className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                                         />
                                     </div>
@@ -1249,13 +1287,19 @@ function CounsellorLeadDetails() {
                                         </div>
                                         <input
                                             type="datetime-local"
+                                            min={followUpData.date || getTodayStartDateTime()}
                                             value={followUpData.nextCallDate}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val && val < getTodayStartDateTime()) {
+                                                    toast.error("Next Follow-up Date cannot be a past date.");
+                                                    return;
+                                                }
                                                 setFollowUpData((prev) => ({
                                                     ...prev,
-                                                    nextCallDate: e.target.value,
-                                                }))
-                                            }
+                                                    nextCallDate: val,
+                                                }));
+                                            }}
                                             className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                                         />
                                     </div>
@@ -1464,13 +1508,19 @@ function CounsellorLeadDetails() {
                                         <input
                                             type="datetime-local"
                                             required
+                                            min={getTodayStartDateTime()}
                                             value={followUpData.date}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val && val < getTodayStartDateTime()) {
+                                                    toast.error("Call Date & Time cannot be a past date.");
+                                                    return;
+                                                }
                                                 setFollowUpData((prev) => ({
                                                     ...prev,
-                                                    date: e.target.value,
-                                                }))
-                                            }
+                                                    date: val,
+                                                }));
+                                            }}
                                             className="w-full rounded-xl border border-slate-200 bg-slate-50/70 p-2.5 text-xs text-slate-800 outline-none"
                                         />
                                     </div>
@@ -1481,13 +1531,19 @@ function CounsellorLeadDetails() {
                                         </label>
                                         <input
                                             type="datetime-local"
+                                            min={followUpData.date || getTodayStartDateTime()}
                                             value={followUpData.nextCallDate}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val && val < getTodayStartDateTime()) {
+                                                    toast.error("Next Follow-up Date cannot be a past date.");
+                                                    return;
+                                                }
                                                 setFollowUpData((prev) => ({
                                                     ...prev,
-                                                    nextCallDate: e.target.value,
-                                                }))
-                                            }
+                                                    nextCallDate: val,
+                                                }));
+                                            }}
                                             className="w-full rounded-xl border border-slate-200 bg-slate-50/70 p-2.5 text-xs text-slate-800 outline-none"
                                         />
                                     </div>

@@ -181,7 +181,7 @@ function CounsellorRegister() {
                   htmlFor="name"
                   className="mb-2 block text-sm font-semibold text-slate-700"
                 >
-                  Full Name
+                  Full Name <span className="text-red-500">*</span>
                 </label>
 
                 <div className="relative">
@@ -207,7 +207,7 @@ function CounsellorRegister() {
                   htmlFor="email"
                   className="mb-2 block text-sm font-semibold text-slate-700"
                 >
-                  Email Address
+                  Email Address <span className="text-red-500">*</span>
                 </label>
 
                 <div className="relative">
@@ -233,7 +233,7 @@ function CounsellorRegister() {
                   htmlFor="phone"
                   className="mb-2 block text-sm font-semibold text-slate-700"
                 >
-                  Phone Number
+                  Phone Number <span className="text-red-500">*</span>
                 </label>
 
                 <div className="relative">
@@ -242,7 +242,7 @@ function CounsellorRegister() {
                   <input
                     id="phone"
                     name="phone"
-                    type="tel"
+                    type="number"
                     autoComplete="tel"
                     placeholder="Enter your phone number"
                     value={formData.phone}
@@ -259,7 +259,7 @@ function CounsellorRegister() {
                   htmlFor="username"
                   className="mb-2 block text-sm font-semibold text-slate-700"
                 >
-                  Username
+                  Username <span className="text-red-500">*</span>
                 </label>
 
                 <div className="relative">
@@ -285,7 +285,7 @@ function CounsellorRegister() {
                   htmlFor="password"
                   className="mb-2 block text-sm font-semibold text-slate-700"
                 >
-                  Password
+                  Password <span className="text-red-500">*</span>
                 </label>
 
                 <div className="relative">
@@ -299,6 +299,7 @@ function CounsellorRegister() {
                     placeholder="Create a password"
                     value={formData.password}
                     onChange={handleChange}
+                    minLength={8}
                     className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 pl-10 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                     required
                   />
@@ -306,18 +307,16 @@ function CounsellorRegister() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
                   >
-                    {showPassword ? (
-                      <FiEyeOff size={18} />
-                    ) : (
-                      <FiEye size={18} />
-                    )}
+                    {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
                   </button>
                 </div>
+
+                <p className="mt-1.5 text-xs text-slate-500">
+                  Password must be at least 8 characters long.
+                </p>
               </div>
 
               {/* Submit */}

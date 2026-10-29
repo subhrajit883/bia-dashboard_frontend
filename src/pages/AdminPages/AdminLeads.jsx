@@ -60,6 +60,24 @@ const CONVERSION_STATUSES = [
     { value: "rejected", label: "Rejected" },
 ];
 
+const formatToLocalDateTime = (date) => {
+    const d = date instanceof Date ? date : new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+const getTodayStartDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}T00:00`;
+};
+
 function AdminLeads() {
     const [leads, setLeads] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -295,10 +313,10 @@ function AdminLeads() {
     // Open Follow-up Modal
     const openFollowUpModal = (lead) => {
         const now = new Date();
-        const isoNow = now.toISOString().slice(0, 16);
+        const isoNow = formatToLocalDateTime(now);
 
         const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-        const isoNextWeek = nextWeek.toISOString().slice(0, 16);
+        const isoNextWeek = formatToLocalDateTime(nextWeek);
 
         setSelectedLeadForFollowUp(lead);
         setFollowUpData({
@@ -317,6 +335,20 @@ function AdminLeads() {
         }
         if (!followUpData.date) {
             toast.error("Please pick a call date.");
+            return;
+        }
+
+        const minDateTime = getTodayStartDateTime();
+        if (followUpData.date < minDateTime) {
+            toast.error("Call Date & Time cannot be a past date.");
+            return;
+        }
+        if (followUpData.nextCallDate && followUpData.nextCallDate < minDateTime) {
+            toast.error("Next Follow-up Date cannot be a past date.");
+            return;
+        }
+        if (followUpData.nextCallDate && followUpData.nextCallDate < followUpData.date) {
+            toast.error("Next Follow-up Date cannot be earlier than Call Date & Time.");
             return;
         }
 
@@ -1212,13 +1244,19 @@ function AdminLeads() {
                                         <input
                                             type="datetime-local"
                                             required
+                                            min={getTodayStartDateTime()}
                                             value={followUpData.date}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val && val < getTodayStartDateTime()) {
+                                                    toast.error("Call Date & Time cannot be a past date.");
+                                                    return;
+                                                }
                                                 setFollowUpData((prev) => ({
                                                     ...prev,
-                                                    date: e.target.value,
-                                                }))
-                                            }
+                                                    date: val,
+                                                }));
+                                            }}
                                             className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white"
                                         />
                                     </div>
@@ -1230,13 +1268,19 @@ function AdminLeads() {
                                         </label>
                                         <input
                                             type="datetime-local"
+                                            min={followUpData.date || getTodayStartDateTime()}
                                             value={followUpData.nextCallDate}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if (val && val < getTodayStartDateTime()) {
+                                                    toast.error("Next Follow-up Date cannot be a past date.");
+                                                    return;
+                                                }
                                                 setFollowUpData((prev) => ({
                                                     ...prev,
-                                                    nextCallDate: e.target.value,
-                                                }))
-                                            }
+                                                    nextCallDate: val,
+                                                }));
+                                            }}
                                             className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white"
                                         />
                                     </div>

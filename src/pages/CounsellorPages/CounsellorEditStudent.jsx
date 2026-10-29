@@ -1425,10 +1425,7 @@ function CounsellorEditStudent() {
                                     </div>
                                     <p className="mt-1 text-xs text-slate-500">
                                         Upload verification documents (e.g. Aadhar card, Voter card,
-                                        certificates). Endpoint:{" "}
-                                        <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-blue-700">
-                                            /api/students/{id}/documents
-                                        </code>
+                                        certificates)
                                     </p>
                                 </div>
 

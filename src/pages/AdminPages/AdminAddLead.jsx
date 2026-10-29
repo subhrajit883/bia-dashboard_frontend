@@ -59,6 +59,15 @@ const getTodayDate = () => {
   return `${year}-${month}-${day}`;
 };
 
+const getYesterdayDate = () => {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 const INITIAL_FORM = {
   candidateType: "lead",
   source: "",
@@ -142,6 +151,19 @@ function AdminAddLead() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "dob" && value) {
+      const today = getTodayDate();
+      if (value >= today) {
+        toast.error("Date of Birth cannot be current or a future date.");
+        setFormData((prev) => ({
+          ...prev,
+          dob: "",
+        }));
+        return;
+      }
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -200,6 +222,13 @@ function AdminAddLead() {
     if (!formData.enrolledCourses || formData.enrolledCourses.length === 0) {
       toast.error("Please select at least one enrolled course.");
       return;
+    }
+    if (formData.dob) {
+      const today = getTodayDate();
+      if (formData.dob >= today) {
+        toast.error("Date of Birth cannot be current or a future date.");
+        return;
+      }
     }
 
     const adminToken = localStorage.getItem("adminToken");
@@ -541,7 +570,7 @@ function AdminAddLead() {
                   <input
                     id="lead-phone"
                     name="phone"
-                    type="tel"
+                    type="number"
                     required
                     value={formData.phone}
                     onChange={handleChange}
@@ -554,7 +583,7 @@ function AdminAddLead() {
               {/* Alternative Phone */}
               <div>
                 <label
-                  htmlFor="lead-alt-phone"
+                  htmlFor="lead-alt-phone"  
                   className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-700"
                 >
                   Alternative Phone
@@ -564,7 +593,7 @@ function AdminAddLead() {
                   <input
                     id="lead-alt-phone"
                     name="alternativePhone"
-                    type="tel"
+                    type="number"
                     value={formData.alternativePhone}
                     onChange={handleChange}
                     placeholder="e.g. 9123456728"
@@ -609,6 +638,7 @@ function AdminAddLead() {
                     id="lead-dob"
                     name="dob"
                     type="date"
+                    max={getYesterdayDate()}
                     value={formData.dob}
                     onChange={handleChange}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pr-4 pl-10 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"

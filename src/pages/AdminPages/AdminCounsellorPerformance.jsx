@@ -730,20 +730,20 @@ function AdminCounsellorPerformance() {
                     </div>
 
                     {/* Active Counsellors */}
-                    <div className="col-span-2 sm:col-span-4 lg:col-span-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs print:col-span-1 print:p-2.5 print:rounded-xl print:border-slate-300 print:shadow-none print:break-inside-avoid">
+                    <div className="col-span-2 sm:col-span-4 lg:col-span-1 rounded-2xl border border-blue-200 bg-blue-100 p-4 shadow-2xs print:col-span-1 print:p-2.5 print:rounded-xl print:border-slate-300 print:shadow-none print:break-inside-avoid">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 print:text-[10px]">
-                                Active Staff
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-400 print:text-[10px]">
+                                Converted Number
                             </span>
                             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 print:h-6 print:w-6">
                                 <UserCheck className="h-4 w-4 print:h-3 print:w-3" />
                             </div>
                         </div>
-                        <p className="mt-2 text-2xl font-black text-slate-900 print:text-xl">
-                            {performanceList.length}
+                        <p className="mt-2 text-2xl font-black text-blue-600 print:text-xl">
+                            {summary?.convertedCount}
                         </p>
-                        <p className="mt-1 text-[10px] text-slate-400">
-                            Performance records
+                        <p className="mt-1 text-[10px] text-blue-700">
+                            Converted Number
                         </p>
                     </div>
                 </div>
