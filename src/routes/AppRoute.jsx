@@ -26,12 +26,14 @@ import AdminAddLead from "../pages/AdminPages/AdminAddLead";
 import AdminEditLead from "../pages/AdminPages/AdminEditLead";
 import AdminLeads from "../pages/AdminPages/AdminLeads";
 import AdminLeadDetails from "../pages/AdminPages/AdminLeadDetails";
+import AdminLeadFollowUp from "../pages/AdminPages/AdminLeadFollowUp";
 import AdminStudents from "../pages/AdminPages/AdminStudents";
 import AdminCounsellor from "../pages/AdminPages/AdminCounsellor";
 import AdminCounsellorPerformance from "../pages/AdminPages/AdminCounsellorPerformance";
 import CounsellorAddLead from "../pages/CounsellorPages/CounsellorAddLead";
 import CounsellorLeads from "../pages/CounsellorPages/CounsellorLeads";
 import CounsellorLeadDetails from "../pages/CounsellorPages/CounsellorLeadDetails";
+import CounsellorLeadFollowUp from "../pages/CounsellorPages/CounsellorLeadFollowUp";
 import CounsellorEditLead from "../pages/CounsellorPages/CounsellorEditLead";
 import CounsellorAddStudent from "../pages/CounsellorPages/CounsellorAddStudent";
 import CounsellorStudent from "../pages/CounsellorPages/CounsellorStudent";
@@ -85,6 +87,9 @@ const AppRoute = () => {
                     <Route path="/admin/leads" element={<AdminLeads />} />
                     {/* <Route path="/admin/emails" element={<AdminEmails />} /> */}
                     <Route path="/admin/leads/:id" element={<AdminLeadDetails />} />
+                    <Route path="/admin/leads/:id/follow-ups" element={<AdminLeadFollowUp />} />
+                    <Route path="/admin/leads/follow-up/:id" element={<AdminLeadFollowUp />} />
+                    <Route path="/admin/lead-follow-up/:id" element={<AdminLeadFollowUp />} />
                     <Route path="/admin/counsellors" element={<AdminCounsellor />} />
                     <Route path="/admin/counsellors-performance" element={<AdminCounsellorPerformance />} />
                     <Route path="/admin/emailtemplate" element={<AdminEmail />} />
@@ -137,6 +142,9 @@ const AppRoute = () => {
                     <Route path="/counsellor/leads/edit/:id" element={<CounsellorEditLead />} />
                     <Route path="/counsellor/leads" element={<CounsellorLeads />} />
                     <Route path="/counsellor/leads/:id" element={<CounsellorLeadDetails />} />
+                    <Route path="/counsellor/leads/:id/follow-ups" element={<CounsellorLeadFollowUp />} />
+                    <Route path="/counsellor/leads/follow-up/:id" element={<CounsellorLeadFollowUp />} />
+                    <Route path="/counsellor/lead-follow-up/:id" element={<CounsellorLeadFollowUp />} />
                     <Route path="/counsellor/addstudent" element={<CounsellorAddStudent />} />
                     <Route path="/counsellor/editstudent/:id" element={<CounsellorEditStudent />} />
                     <Route path="/counsellor/students/edit/:id" element={<CounsellorEditStudent />} />

@@ -1413,69 +1413,89 @@ function AdminLeadDetails() {
                                         No remarks match "{remarkSearch}".
                                     </div>
                                 ) : (
-                                    <div className="relative border-l-2 border-slate-200/80 pl-6 ml-3 space-y-6 min-w-0">
-                                        {filteredRemarks.map((remark, idx) => {
-                                            const callerName = remark.calledBy?.name || "Staff";
-                                            return (
-                                                <div
-                                                    key={remark._id || idx}
-                                                    className="group relative min-w-0"
-                                                >
-                                                    {/* Timeline Node Point */}
-                                                    <span className="absolute -left-[31px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-white ring-4 ring-blue-100 border-2 border-blue-600">
-                                                        <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
-                                                    </span>
+                                    <div className="space-y-6">
+                                        <div className="relative border-l-2 border-slate-200/80 pl-6 ml-3 space-y-6 min-w-0">
+                                            {filteredRemarks.slice(0, 5).map((remark, idx) => {
+                                                const callerName = remark.calledBy?.name || "Staff";
+                                                return (
+                                                    <div
+                                                        key={remark._id || idx}
+                                                        className="group relative min-w-0"
+                                                    >
+                                                        {/* Timeline Node Point */}
+                                                        <span className="absolute -left-[31px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-white ring-4 ring-blue-100 border-2 border-blue-600">
+                                                            <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                                                        </span>
 
-                                                    {/* Remark Box */}
-                                                    <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4.5 transition hover:border-blue-200 hover:bg-white hover:shadow-xs min-w-0 overflow-hidden">
-                                                        {/* Top Row: Caller & Timestamps */}
-                                                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="inline-flex items-center gap-1.5 rounded-md bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-700">
-                                                                    <User className="h-3 w-3" />
-                                                                    {callerName}
-                                                                </span>
-                                                                <span className="text-[11px] text-slate-400">
-                                                                    {getRelativeTime(remark.date)}
-                                                                </span>
-                                                            </div>
-
-                                                            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                                                                <Clock className="h-3.5 w-3.5 text-slate-400" />
-                                                                <span>{formatDateTime(remark.date)}</span>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Description Content */}
-                                                        <p className="mt-3 text-xs leading-relaxed text-slate-800 whitespace-pre-line font-medium break-words [overflow-wrap:anywhere] [word-break:break-word]">
-                                                            {remark.description}
-                                                        </p>
-
-                                                        {/* Bottom Meta: Next Call Date & Reminder Status */}
-                                                        <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-slate-100 text-[11px]">
-                                                            {remark.nextCallDate ? (
-                                                                <div className="flex items-center gap-1.5 font-semibold text-slate-700">
-                                                                    <CalendarClock className="h-3.5 w-3.5 text-blue-600" />
-                                                                    <span>Next Call:</span>
-                                                                    <span className="rounded-md bg-blue-100/70 px-2 py-0.5 text-blue-800 font-bold">
-                                                                        {formatDateTime(remark.nextCallDate)}
+                                                        {/* Remark Box */}
+                                                        <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4.5 transition hover:border-blue-200 hover:bg-white hover:shadow-xs min-w-0 overflow-hidden">
+                                                            {/* Top Row: Caller & Timestamps */}
+                                                            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="inline-flex items-center gap-1.5 rounded-md bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-700">
+                                                                        <User className="h-3 w-3" />
+                                                                        {callerName}
+                                                                    </span>
+                                                                    <span className="text-[11px] text-slate-400">
+                                                                        {getRelativeTime(remark.date)}
                                                                     </span>
                                                                 </div>
-                                                            ) : (
-                                                                <span className="text-slate-400">No scheduled next call</span>
-                                                            )}
 
-                                                            {remark.reminderSent && (
-                                                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
-                                                                    <Bell className="h-3 w-3" />
-                                                                    Reminder Sent
-                                                                </span>
-                                                            )}
+                                                                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                                                    <Clock className="h-3.5 w-3.5 text-slate-400" />
+                                                                    <span>{formatDateTime(remark.date)}</span>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Description Content */}
+                                                            <p className="mt-3 text-xs leading-relaxed text-slate-800 whitespace-pre-line font-medium break-words [overflow-wrap:anywhere] [word-break:break-word]">
+                                                                {remark.description}
+                                                            </p>
+
+                                                            {/* Bottom Meta: Next Call Date & Reminder Status */}
+                                                            <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-slate-100 text-[11px]">
+                                                                {remark.nextCallDate ? (
+                                                                    <div className="flex items-center gap-1.5 font-semibold text-slate-700">
+                                                                        <CalendarClock className="h-3.5 w-3.5 text-blue-600" />
+                                                                        <span>Next Call:</span>
+                                                                        <span className="rounded-md bg-blue-100/70 px-2 py-0.5 text-blue-800 font-bold">
+                                                                            {formatDateTime(remark.nextCallDate)}
+                                                                        </span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <span className="text-slate-400">No scheduled next call</span>
+                                                                )}
+
+                                                                {remark.reminderSent && (
+                                                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
+                                                                        <Bell className="h-3 w-3" />
+                                                                        Reminder Sent
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })}
+                                                );
+                                            })}
+                                        </div>
+
+                                        {/* Show More Button */}
+                                        <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                                            <p className="text-xs text-slate-500 font-medium">
+                                                Showing {Math.min(5, filteredRemarks.length)} of {sortedRemarks.length} follow-ups
+                                                {sortedRemarks.length > 5 && (
+                                                    <span className="ml-1 text-slate-400">({sortedRemarks.length - 5} more)</span>
+                                                )}
+                                            </p>
+                                            <Link
+                                                to={`/admin/leads/${id}/follow-ups`}
+                                                state={{ lead }}
+                                                className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm shadow-blue-600/30 hover:bg-blue-700 hover:shadow-md transition active:scale-95 group"
+                                            >
+                                                <span>Show More</span>
+                                                <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                                            </Link>
+                                        </div>
                                     </div>
                                 )}
                             </div>
