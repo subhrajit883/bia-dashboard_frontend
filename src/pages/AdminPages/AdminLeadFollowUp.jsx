@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
+import { useParams, Link, useLocation, useNavigate, Navigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import {
@@ -47,10 +47,17 @@ const getTodayStartDateTime = () => {
     return `${year}-${month}-${day}T00:00`;
 };
 
+const isValidObjectId = (val) => Boolean(val) && /^[0-9a-fA-F]{24}$/.test(val);
+
 function AdminLeadFollowUp() {
     const { id } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
+
+    // If ID is not a valid 24-character hex ObjectId, route does not exist -> redirect to Homepage
+    if (!isValidObjectId(id)) {
+        return <Navigate to="/" replace />;
+    }
 
     // Lead state
     const [lead, setLead] = useState(location.state?.lead || null);
@@ -100,9 +107,6 @@ function AdminLeadFollowUp() {
             }
         } catch (err) {
             console.error("Fetch lead follow-ups error:", err);
-            toast.error(
-                err.response?.data?.message || err.message || "Failed to load lead follow-ups"
-            );
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -348,38 +352,9 @@ function AdminLeadFollowUp() {
         );
     }
 
-    // Lead Not Found State
+    // Lead Not Found State -> Redirect to Homepage
     if (!lead) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
-                <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xl">
-                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
-                        <AlertCircle className="h-8 w-8" />
-                    </div>
-                    <h2 className="mt-4 text-xl font-bold text-slate-900">Lead Not Found</h2>
-                    <p className="mt-2 text-sm text-slate-500">
-                        The lead with ID <span className="font-mono text-slate-700">{id}</span> could not be loaded or may have been removed.
-                    </p>
-                    <div className="mt-6 flex items-center justify-center gap-3">
-                        <Link
-                            to="/admin/leads"
-                            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition"
-                        >
-                            <ArrowLeft className="h-4 w-4" />
-                            Return to All Leads
-                        </Link>
-                        <button
-                            type="button"
-                            onClick={() => loadLeadData(true)}
-                            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
-                        >
-                            <RefreshCw className="h-4 w-4" />
-                            Retry
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
+        return <Navigate to="/" replace />;
     }
 
     const coursesList = Array.isArray(lead.enrolledCourses) && lead.enrolledCourses.length > 0

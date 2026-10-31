@@ -1,7 +1,7 @@
 import { Mail, Eye, SquarePen, Trash2 } from "lucide-react";
 import { TARGET_TYPES, extractTags, formatDate } from "./emailTemplateConstants";
 
-function EmailTemplateTable({ templates, onPreview, onEdit, onDelete }) {
+function EmailTemplateTable({ templates, onPreview, onEdit, onDelete, canEdit = true }) {
     return (
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
             <div className="overflow-x-auto">
@@ -25,6 +25,7 @@ function EmailTemplateTable({ templates, onPreview, onEdit, onDelete }) {
                                     color: "bg-purple-50 text-purple-700 border-purple-200 ring-purple-500/20",
                                 };
                             const detectedTags = extractTags(`${template.subject} ${template.body}`);
+                            const showEdit = typeof canEdit === "function" ? canEdit(template) : canEdit;
 
                             return (
                                 <tr
@@ -120,14 +121,16 @@ function EmailTemplateTable({ templates, onPreview, onEdit, onDelete }) {
                                                 <Eye className="h-3.5 w-3.5" />
                                             </button>
 
-                                            <button
-                                                type="button"
-                                                onClick={() => onEdit(template)}
-                                                title="Edit Template"
-                                                className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 transition hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700"
-                                            >
-                                                <SquarePen className="h-3.5 w-3.5" />
-                                            </button>
+                                            {showEdit && onEdit && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onEdit(template)}
+                                                    title="Edit Template"
+                                                    className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 transition hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700"
+                                                >
+                                                    <SquarePen className="h-3.5 w-3.5" />
+                                                </button>
+                                            )}
 
                                             <button
                                                 type="button"

@@ -33,7 +33,7 @@ import {
     RotateCcw
 } from "lucide-react";
 import { counsellorUrl, BASE_URL } from "../../config/config";
-import { getToken, getUser, USER_KEY } from "../../utils/auth";
+import { getToken } from "../../utils/auth";
 
 const CounsellorProfile = () => {
     // State management
@@ -93,11 +93,7 @@ const CounsellorProfile = () => {
                     username: userData.username || "",
                 });
 
-                // Sync local storage user cache if present
-                const cached = getUser();
-                if (cached) {
-                    localStorage.setItem(USER_KEY, JSON.stringify({ ...cached, ...userData }));
-                }
+
 
                 if (isRefresh) {
                     toast.success("Profile refreshed with latest data.");
@@ -220,11 +216,7 @@ const CounsellorProfile = () => {
                     username: updatedData.username || "",
                 });
 
-                // Update localStorage user object
-                const cachedUser = getUser();
-                if (cachedUser) {
-                    localStorage.setItem(USER_KEY, JSON.stringify({ ...cachedUser, ...updatedData }));
-                }
+
 
                 toast.success(response.data.message || "Profile updated successfully!");
                 setIsEditing(false);
@@ -258,7 +250,7 @@ const CounsellorProfile = () => {
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         try {
-            
+
             const date = new Date(dateString);
             if (isNaN(date.getTime())) return dateString;
             return new Intl.DateTimeFormat("en-IN", {
@@ -840,7 +832,7 @@ const CounsellorProfile = () => {
                                             <Users className="w-4 h-4" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold">My Leads</p>
+                                            <p className="text-xs font-bold">All Leads</p>
                                             <p className="text-[11px] text-slate-400">View and update active leads</p>
                                         </div>
                                     </div>

@@ -36,13 +36,9 @@ export const saveAuthData = (payload = {}) => {
     localStorage.setItem(TOKEN_KEY, token);
   }
 
-  if (payload.user) {
-    localStorage.setItem(USER_KEY, JSON.stringify(payload.user));
-  }
-
-  if (payload.role) {
-    localStorage.setItem(ROLE_KEY, payload.role);
-  }
+  // Do not store user details or role in localStorage, only token
+  localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(ROLE_KEY);
 
   return token;
 };
@@ -66,13 +62,12 @@ export const clearAuthData = () => {
 export const isAuthenticated = () => Boolean(getToken());
 
 export const loginUser = async ({ username, password, role = "counsellor" }) => {
-  const identifier = (username || email || "").trim();
+  const identifier = (username || "").trim();
 
   const response = await axios.post(
     authUrl.login,
     {
-      // email: (email || identifier).trim(),
-      username: (username || identifier).trim(),
+      username: identifier,
       password,
       role,
     },

@@ -48,11 +48,12 @@ function AdminLogin() {
         return;
       }
 
+
       localStorage.setItem("adminToken", data.token);
-      localStorage.setItem("adminRole", data.role);
-      if (data.user) {
-        localStorage.setItem("adminUser", JSON.stringify(data.user));
-      }
+      localStorage.removeItem("adminRole");
+
+      localStorage.removeItem("adminUser");
+
 
       toast.success(message || "Login successful!");
       navigate("/admin/leads", { replace: true });
@@ -73,13 +74,15 @@ function AdminLogin() {
       if (expiredMsg) {
         sessionStorage.removeItem("auth_session_expired");
         toast.error(expiredMsg);
-      }
-    } catch (e) {
-      console.error(e);
-    }
 
-    if (localStorage.getItem("adminToken")) {
-      navigate("/admin/leads", { replace: true });
+      }
+
+      if (localStorage.getItem("adminToken")) {
+        navigate("/admin/leads", { replace: true });
+      }
+    }
+    catch (e) {
+      console.error(e);
     }
   }, [navigate]);
 
@@ -93,7 +96,7 @@ function AdminLogin() {
           <div className="pointer-events-none absolute bottom-28 left-12 h-32 w-32 rounded-full bg-blue-400/10 blur-2xl" />
 
           <div className="relative z-10 w-full">
-            <div className="flex w-full rounded-2xl items-center justify-center bg-white">
+            <div className="flex w-full cursor-pointer rounded-2xl items-center justify-center bg-white" onClick={() => navigate("/")}>
               <img
                 src={logo}
                 alt="Bi Academy Logo"
@@ -135,7 +138,7 @@ function AdminLogin() {
 
         <div className="flex items-center justify-center px-6 py-10 sm:px-10 md:px-12 lg:px-14">
           <div className="w-full max-w-md">
-            <div className="mb-9 flex justify-center md:hidden bg-white">
+            <div className="mb-9 flex justify-center md:hidden bg-white cursor-pointer" onClick={() => navigate("/")}>
               <img
                 src={logo}
                 alt="BIA Logo"

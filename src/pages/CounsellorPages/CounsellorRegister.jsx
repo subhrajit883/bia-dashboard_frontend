@@ -109,7 +109,7 @@ function CounsellorRegister() {
           <div className="absolute -right-10 top-36 h-44 w-44 rounded-full border border-white/10" /> */}
 
           <div className="relative">
-            <div className="mb-10 inline-flex items-center gap-3 rounded-xl bg-white px-4 py-3">
+            <div className="mb-10 inline-flex items-center gap-3 rounded-xl bg-white px-4 py-3" onClick={() => navigate("/")}>
               <img
                 src={logo}
                 alt="Bia Logo"
@@ -152,10 +152,10 @@ function CounsellorRegister() {
         {/* Right panel */}
         <div className="flex items-center justify-center px-6 py-10 sm:px-10 md:px-12">
           <div className="w-full max-w-md">
-            <div className="mb-8 md:hidden">
+            <div className="mb-8 md:hidden" onClick={() => navigate("/")}>
               <img
                 src={logo}
-                alt="Bi Talents Logo"
+                alt="Bia Logo"
                 className="mx-auto h-16 w-auto object-contain"
               />
             </div>

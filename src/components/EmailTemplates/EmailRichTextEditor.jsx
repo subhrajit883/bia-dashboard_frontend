@@ -219,7 +219,7 @@ function EmailRichTextEditor({
                             <Edit3 className="h-3.5 w-3.5" />
                             Visual Editor
                         </button>
-                        <button
+                        {/* <button
                             type="button"
                             onClick={() => setActiveTab("plain")}
                             className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${activeTab === "plain"
@@ -229,8 +229,8 @@ function EmailRichTextEditor({
                         >
                             <Type className="h-3.5 w-3.5" />
                             Plain Text (Auto-HTML)
-                        </button>
-                        <button
+                        </button> */}
+                        {/* <button
                             type="button"
                             onClick={() => setActiveTab("code")}
                             className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${activeTab === "code"
@@ -240,8 +240,8 @@ function EmailRichTextEditor({
                         >
                             <Code2 className="h-3.5 w-3.5" />
                             HTML Source
-                        </button>
-                        <button
+                        </button> */}
+                        {/* <button
                             type="button"
                             onClick={() => setActiveTab("preview")}
                             className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${activeTab === "preview"
@@ -251,7 +251,7 @@ function EmailRichTextEditor({
                         >
                             <Eye className="h-3.5 w-3.5" />
                             Live Preview
-                        </button>
+                        </button> */}
                     </div>
 
                     <div className="flex items-center gap-2">

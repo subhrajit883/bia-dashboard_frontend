@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Eye, X, Copy, Check, SquarePen } from "lucide-react";
 import { renderWithSampleData, extractTags } from "./emailTemplateConstants";
 
-function EmailTemplatePreviewModal({ template, onClose, onEdit, onCopy, copiedTag }) {
+function EmailTemplatePreviewModal({ template, onClose, onEdit, onCopy, copiedTag, canEdit = true }) {
     const [previewMode, setPreviewMode] = useState("rendered"); // "rendered" | "raw"
+    const showEdit = typeof canEdit === "function" ? canEdit(template) : canEdit;
 
     if (!template) return null;
 
@@ -152,17 +153,19 @@ function EmailTemplatePreviewModal({ template, onClose, onEdit, onCopy, copiedTa
                     </button> */}
 
                     <div className="flex items-center gap-2">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                onClose();
-                                onEdit(template);
-                            }}
-                            className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-2xs hover:bg-emerald-700 transition"
-                        >
-                            <SquarePen className="h-3.5 w-3.5" />
-                            Edit Template
-                        </button>
+                        {showEdit && onEdit && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    onClose();
+                                    onEdit(template);
+                                }}
+                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-2xs hover:bg-emerald-700 transition"
+                            >
+                                <SquarePen className="h-3.5 w-3.5" />
+                                Edit Template
+                            </button>
+                        )}
 
                         <button
                             type="button"

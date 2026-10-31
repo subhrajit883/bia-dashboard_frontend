@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
+import { Link, useParams, useLocation, useNavigate, Navigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import {
@@ -133,10 +133,17 @@ const parseLeadToFormData = (lead) => {
   };
 };
 
+const isValidObjectId = (val) => Boolean(val) && /^[0-9a-fA-F]{24}$/.test(val);
+
 function CounsellorEditLead() {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // If ID is not a valid 24-character hex ObjectId, route does not exist -> redirect to Homepage
+  if (!isValidObjectId(id)) {
+    return <Navigate to="/" replace />;
+  }
 
   // Initial state pre-populated if passed via router state
   const [formData, setFormData] = useState(() => {
@@ -400,30 +407,9 @@ function CounsellorEditLead() {
     toast("Reverted form to original lead data", { icon: "↩️" });
   };
 
-  // If lead is not found and finished loading
-  if (loadError && !formData.name) {
-    return (
-      <section className="min-h-screen bg-slate-50 px-4 py-8 sm:px-8">
-        <div className="mx-auto max-w-xl text-center mt-12 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
-            <AlertCircle className="h-7 w-7" />
-          </div>
-          <h2 className="mt-4 text-xl font-bold text-slate-900">Lead Not Found</h2>
-          <p className="mt-2 text-sm text-slate-500">
-            {loadError}
-          </p>
-          <div className="mt-6 flex justify-center gap-3">
-            <Link
-              to="/counsellor/leads"
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
-            >
-              <Users className="h-4 w-4" />
-              Return to All Leads
-            </Link>
-          </div>
-        </div>
-      </section>
-    );
+  // If lead is not found and finished loading -> redirect to Homepage
+  if (loadError && !formData.name && !loadingLead) {
+    return <Navigate to="/" replace />;
   }
 
   return (

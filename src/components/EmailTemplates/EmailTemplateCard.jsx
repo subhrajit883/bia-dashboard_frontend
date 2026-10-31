@@ -7,7 +7,9 @@ function EmailTemplateCard({
     onDuplicate,
     onEdit,
     onDelete,
+    canEdit = true,
 }) {
+    const showEdit = typeof canEdit === "function" ? canEdit(template) : canEdit;
     const targetConfig =
         TARGET_TYPES.find((t) => t.value === template.targetType) || {
             label: template.targetType || "all",
@@ -99,14 +101,14 @@ function EmailTemplateCard({
 
                 <div className="flex items-center gap-1.5">
                     {/* Preview button */}
-                    <button
+                    {/* <button
                         type="button"
                         onClick={() => onPreview(template)}
                         title="Preview Email"
                         className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 transition hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700"
                     >
                         <Eye className="h-3.5 w-3.5" />
-                    </button>
+                    </button> */}
 
                     {/* Duplicate / Clone */}
                     <button
@@ -119,14 +121,16 @@ function EmailTemplateCard({
                     </button>
 
                     {/* Edit */}
-                    <button
-                        type="button"
-                        onClick={() => onEdit(template)}
-                        title="Edit Template"
-                        className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 transition hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700"
-                    >
-                        <SquarePen className="h-3.5 w-3.5" />
-                    </button>
+                    {showEdit && onEdit && (
+                        <button
+                            type="button"
+                            onClick={() => onEdit(template)}
+                            title="Edit Template"
+                            className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 transition hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700"
+                        >
+                            <SquarePen className="h-3.5 w-3.5" />
+                        </button>
+                    )}
 
                     {/* Delete */}
                     <button

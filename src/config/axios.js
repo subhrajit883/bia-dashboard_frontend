@@ -69,7 +69,7 @@ export const handle401Error = (error, roleHint = null) => {
       isAdmin = true;
     } else if (counsellorToken && !adminToken) {
       isAdmin = false;
-    } else if (localStorage.getItem("adminRole") === "admin") {
+    } else if (Boolean(adminToken)) {
       isAdmin = true;
     }
   }

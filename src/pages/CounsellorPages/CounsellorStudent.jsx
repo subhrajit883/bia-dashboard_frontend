@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
 import {
     Users, Search, Filter, RefreshCw, Plus, Phone, Mail, Calendar, BookOpen, UserCheck, X,
     RotateCcw, Sparkles, ChevronDown, ChevronUp, Check, Copy, IndianRupee, FileText,
@@ -22,6 +23,7 @@ const PAYMENT_STATUSES = [
     { value: "paid", label: "Paid", color: "bg-emerald-50 text-emerald-700 border-emerald-200 ring-emerald-500/20" },
     { value: "overdue", label: "Overdue", color: "bg-rose-50 text-rose-700 border-rose-200 ring-rose-500/20" },
 ];
+
 
 function CounsellorStudent() {
     // Student list & loading state
@@ -47,13 +49,63 @@ function CounsellorStudent() {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
+
     const [totalStudentsCount, setTotalStudentsCount] = useState(0);
 
     // Modals state
     const [selectedStudentForDetails, setSelectedStudentForDetails] = useState(null);
     const [selectedStudentForDocs, setSelectedStudentForDocs] = useState(null);
 
-    // Fetch reference dropdown data once (Courses & Counsellors)
+    const loggedInCounsellorId = useMemo(() => {
+        const token = localStorage.getItem("token");
+        if (!token) return null;
+        try {
+            const decoded = typeof jwtDecode === "function" ? jwtDecode(token) : null;
+            if (decoded?.id || decoded?._id || decoded?.userId) {
+                return String(decoded.id || decoded._id || decoded.userId);
+            }
+        } catch (e) {
+            console.error("Error decoding token with jwtDecode:", e);
+        }
+
+        try {
+            const payloadBase64 = token.split(".")[1];
+            if (payloadBase64) {
+                const normalized = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
+                const decodedJson = atob(normalized);
+                const parsed = JSON.parse(decodedJson);
+                return parsed?.id || parsed?._id || parsed?.userId
+                    ? String(parsed.id || parsed._id || parsed.userId)
+                    : null;
+            }
+        } catch {
+            return null;
+        }
+        return null;
+    }, []);
+
+    // Check if the current counsellor is the assigned counsellor for the student
+    const canEditStudent = useCallback(
+        (student) => {
+            if (!loggedInCounsellorId || !student) return false;
+
+            const assigned = student.assignedCounsellor;
+            if (!assigned) return false;
+
+            let assignedId = null;
+            if (typeof assigned === "object") {
+                assignedId = assigned._id || assigned.id || null;
+            } else if (typeof assigned === "string") {
+                assignedId = assigned;
+            }
+
+            if (!assignedId) return false;
+
+            return String(assignedId).trim() === String(loggedInCounsellorId).trim();
+        },
+        [loggedInCounsellorId]
+    );
+
     useEffect(() => {
         let isMounted = true;
         const fetchReferences = async () => {
@@ -911,14 +963,17 @@ function CounsellorStudent() {
                                                             <Eye className="h-3.5 w-3.5 text-slate-500" />
                                                         </button>
 
-                                                        <Link
-                                                            to={`/counsellor/students/edit/${student._id || student.s_id}`}
-                                                            state={{ student }}
-                                                            title="Edit Student"
-                                                            className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 transition hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700"
-                                                        >
-                                                            <SquarePen className="h-3.5 w-3.5 text-slate-500 hover:text-emerald-600" />
-                                                        </Link>
+                                                        {canEditStudent(student) && (
+                                                            <Link
+                                                                to={`/counsellor/students/edit/${student._id || student.s_id}`}
+                                                                state={{ student }}
+                                                                title="Edit Student"
+                                                                className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 transition hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700"
+                                                            >
+                                                                <SquarePen className="h-3.5 w-3.5 text-slate-500 hover:text-emerald-600" />
+                                                            </Link>
+                                                        )}
+
                                                     </div>
                                                 </td>
                                             </tr>
@@ -1233,14 +1288,16 @@ function CounsellorStudent() {
 
                             {/* Modal Close Action */}
                             <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-                                <Link
-                                    to={`/counsellor/students/edit/${selectedStudentForDetails._id || selectedStudentForDetails.s_id}`}
-                                    state={{ student: selectedStudentForDetails }}
-                                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-2xs hover:bg-emerald-700 transition"
-                                >
-                                    <SquarePen className="h-3.5 w-3.5" />
-                                    <span>Edit Student</span>
-                                </Link>
+                                {canEditStudent(selectedStudentForDetails) && (
+                                    <Link
+                                        to={`/counsellor/students/edit/${selectedStudentForDetails._id || selectedStudentForDetails.s_id}`}
+                                        state={{ student: selectedStudentForDetails }}
+                                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-2xs hover:bg-emerald-700 transition"
+                                    >
+                                        <SquarePen className="h-3.5 w-3.5" />
+                                        <span>Edit Student</span>
+                                    </Link>
+                                )}
 
                                 <button
                                     type="button"

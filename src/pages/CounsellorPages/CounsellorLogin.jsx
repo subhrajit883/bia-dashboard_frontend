@@ -22,8 +22,6 @@ function CounsellorLogin() {
 
   const handleLogin = async (e) => {
 
-    console.log("clicked");
-    console.log(username, password);
     e.preventDefault();
 
     if (!username.trim() || !password) {
@@ -94,7 +92,7 @@ function CounsellorLogin() {
           {/* Centered logo without white container */}
 
           <div className="relative z-10 w-full">
-            <div className="mb-10 inline-flex items-center gap-3 rounded-xl bg-white px-4 py-3">
+            <div className="mb-10 inline-flex items-center gap-3 rounded-xl bg-white px-4 py-3" onClick={() => navigate("/")}>
               <img
                 src={logo}
                 alt="Bia Logo"

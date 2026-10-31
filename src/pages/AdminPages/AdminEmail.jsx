@@ -53,7 +53,7 @@ function AdminEmail() {
 
     // Helper to get authorization headers with Bearer token
     const getAuthHeaders = () => {
-        const token = localStorage.getItem("adminToken");
+        const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
         return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
@@ -62,22 +62,75 @@ function AdminEmail() {
         setLoading(true);
         try {
             const url = emailTemplateUrl?.templates || emailUrl?.templates || "/api/emails/templates";
-            const res = await axios.get(url, { headers: getAuthHeaders() });
+            const adminToken = localStorage.getItem("adminToken");
+            const counsellorToken = localStorage.getItem("token");
 
-            let list = [];
-            if (Array.isArray(res.data?.data)) {
-                list = res.data.data;
-            } else if (Array.isArray(res.data)) {
-                list = res.data;
-            } else if (Array.isArray(res.data?.templates)) {
-                list = res.data.templates;
-            } else if (res.data?.template) {
-                list = [res.data.template];
+            const requests = [];
+            if (adminToken) {
+                requests.push(
+                    axios.get(url, { headers: { Authorization: `Bearer ${adminToken}` } }).catch((err) => {
+                        console.warn("Fetch with adminToken warning:", err.response?.data || err.message);
+                        return { data: [] };
+                    })
+                );
+            }
+            if (counsellorToken && counsellorToken !== adminToken) {
+                requests.push(
+                    axios.get(url, { headers: { Authorization: `Bearer ${counsellorToken}` } }).catch((err) => {
+                        console.warn("Fetch with counsellor token warning:", err.response?.data || err.message);
+                        return { data: [] };
+                    })
+                );
+            }
+            if (requests.length === 0) {
+                requests.push(axios.get(url).catch(() => ({ data: [] })));
             }
 
-            setTemplates(list);
+            const responses = await Promise.all(requests);
+            const templateMap = new Map();
+
+            for (const res of responses) {
+                let list = [];
+                if (Array.isArray(res.data?.data)) {
+                    list = res.data.data;
+                } else if (Array.isArray(res.data)) {
+                    list = res.data;
+                } else if (Array.isArray(res.data?.templates)) {
+                    list = res.data.templates;
+                } else if (res.data?.template) {
+                    list = [res.data.template];
+                }
+
+                for (const item of list) {
+                    if (item && (item._id || item.id)) {
+                        templateMap.set(String(item._id || item.id), item);
+                    }
+                }
+            }
+
+            // Sync with local drafts store so all saved drafts are guaranteed to show
+            try {
+                const localDraftsRaw = localStorage.getItem("saved_email_drafts");
+                if (localDraftsRaw) {
+                    const localDrafts = JSON.parse(localDraftsRaw);
+                    if (Array.isArray(localDrafts)) {
+                        for (const d of localDrafts) {
+                            if (d && (d._id || d.id)) {
+                                if (!templateMap.has(String(d._id || d.id))) {
+                                    templateMap.set(String(d._id || d.id), d);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Local drafts load error:", e);
+            }
+
+            const combinedList = Array.from(templateMap.values());
+            setTemplates(combinedList);
             if (showToast) {
-                toast.success(`Synced ${list.length} email templates`);
+                toast.success(`Synced ${combinedList.length} email templates`);
             }
         } catch (err) {
             console.error("Fetch email templates error:", err.response?.data || err);
@@ -176,6 +229,36 @@ function AdminEmail() {
                 toast.success("Template created successfully!");
             }
 
+            // Sync draft to persistent local storage so it displays everywhere
+            if (payload.isDraft) {
+                try {
+                    const localDraftsRaw = localStorage.getItem("saved_email_drafts");
+                    const localDrafts = localDraftsRaw ? JSON.parse(localDraftsRaw) : [];
+                    const draftItem = {
+                        _id: editingTemplate?._id || `draft_${Date.now()}`,
+                        ...payload,
+                        createdAt: editingTemplate?.createdAt || new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                    };
+                    const updated = [draftItem, ...localDrafts.filter((d) => d._id !== draftItem._id)];
+                    localStorage.setItem("saved_email_drafts", JSON.stringify(updated));
+                } catch (e) {
+                    console.error("Save local draft error:", e);
+                }
+            } else if (editingTemplate) {
+                // If it was previously a draft and now published, remove from drafts store
+                try {
+                    const localDraftsRaw = localStorage.getItem("saved_email_drafts");
+                    if (localDraftsRaw) {
+                        const localDrafts = JSON.parse(localDraftsRaw);
+                        const updated = localDrafts.filter((d) => d._id !== editingTemplate._id);
+                        localStorage.setItem("saved_email_drafts", JSON.stringify(updated));
+                    }
+                } catch (e) {
+                    console.error("Remove local draft error:", e);
+                }
+            }
+
             setIsFormModalOpen(false);
             fetchTemplates();
         } catch (err) {
@@ -201,6 +284,19 @@ function AdminEmail() {
                 : `/api/emails/templates/${templateToDelete._id}`;
 
             await axios.delete(deleteUrl, { headers });
+
+            // Also clean up from local drafts if applicable
+            try {
+                const localDraftsRaw = localStorage.getItem("saved_email_drafts");
+                if (localDraftsRaw) {
+                    const localDrafts = JSON.parse(localDraftsRaw);
+                    const updated = localDrafts.filter((d) => d._id !== templateToDelete._id);
+                    localStorage.setItem("saved_email_drafts", JSON.stringify(updated));
+                }
+            } catch (e) {
+                console.error("Clean local draft error:", e);
+            }
+
             toast.success("Template deleted successfully!");
             setTemplateToDelete(null);
             fetchTemplates();
@@ -350,9 +446,17 @@ function AdminEmail() {
                 {/* 2. STATS SUMMARY CARDS */}
                 {/* ========================================================================= */}
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs">
+                    <div
+                        onClick={() => handleClearFilters()}
+                        className={`cursor-pointer rounded-2xl border p-4 shadow-2xs transition hover:scale-[1.01] ${
+                            !statusFilter && !targetTypeFilter
+                                ? "border-blue-400 bg-blue-50/70 ring-2 ring-blue-400/30"
+                                : "border-slate-200 bg-white hover:border-slate-300"
+                        }`}
+                        title="Click to view all templates"
+                    >
                         <div className="flex items-center justify-between">
-                            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
                                 Total Templates
                             </p>
                             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
@@ -367,7 +471,18 @@ function AdminEmail() {
                         </p>
                     </div>
 
-                    <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 shadow-2xs">
+                    <div
+                        onClick={() => {
+                            setStatusFilter(statusFilter === "published" ? "" : "published");
+                            setPage(1);
+                        }}
+                        className={`cursor-pointer rounded-2xl border p-4 shadow-2xs transition hover:scale-[1.01] ${
+                            statusFilter === "published"
+                                ? "border-emerald-400 bg-emerald-100/70 ring-2 ring-emerald-500/30"
+                                : "border-emerald-100 bg-emerald-50/50 hover:border-emerald-300"
+                        }`}
+                        title="Click to filter published templates"
+                    >
                         <div className="flex items-center justify-between">
                             <p className="text-xs font-bold uppercase tracking-wider text-emerald-600">
                                 Active &amp; Ready
@@ -384,7 +499,18 @@ function AdminEmail() {
                         </p>
                     </div>
 
-                    <div className="rounded-2xl border border-amber-100 bg-amber-50/50 p-4 shadow-2xs">
+                    <div
+                        onClick={() => {
+                            setStatusFilter(statusFilter === "draft" ? "" : "draft");
+                            setPage(1);
+                        }}
+                        className={`cursor-pointer rounded-2xl border p-4 shadow-2xs transition hover:scale-[1.01] ${
+                            statusFilter === "draft"
+                                ? "border-amber-400 bg-amber-100/80 ring-2 ring-amber-500/30"
+                                : "border-amber-100 bg-amber-50/50 hover:border-amber-300"
+                        }`}
+                        title="Click to filter saved drafts"
+                    >
                         <div className="flex items-center justify-between">
                             <p className="text-xs font-bold uppercase tracking-wider text-amber-600">
                                 Saved Drafts
@@ -516,6 +642,70 @@ function AdminEmail() {
                                 </button>
                             )}
                         </div>
+                    </div>
+
+                    {/* Quick Filter Pill Buttons */}
+                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-1">
+                            Quick Filter:
+                        </span>
+                        <button
+                            type="button"
+                            onClick={() => { setStatusFilter(""); setTargetTypeFilter(""); setPage(1); }}
+                            className={`cursor-pointer px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
+                                !statusFilter && !targetTypeFilter
+                                    ? "bg-slate-900 text-white shadow-xs"
+                                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                            }`}
+                        >
+                            All Templates ({stats.total})
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setStatusFilter(statusFilter === "published" ? "" : "published"); setPage(1); }}
+                            className={`cursor-pointer px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
+                                statusFilter === "published"
+                                    ? "bg-emerald-600 text-white shadow-xs shadow-emerald-600/20"
+                                    : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+                            }`}
+                        >
+                            <ShieldCheck className="h-3.5 w-3.5" />
+                            Published ({stats.activePublished})
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setStatusFilter(statusFilter === "draft" ? "" : "draft"); setPage(1); }}
+                            className={`cursor-pointer px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
+                                statusFilter === "draft"
+                                    ? "bg-amber-600 text-white shadow-xs shadow-amber-600/20"
+                                    : "bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200"
+                            }`}
+                        >
+                            <FileEdit className="h-3.5 w-3.5" />
+                            Saved Drafts ({stats.drafts})
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setTargetTypeFilter(targetTypeFilter === "lead" ? "" : "lead"); setPage(1); }}
+                            className={`cursor-pointer px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
+                                targetTypeFilter === "lead"
+                                    ? "bg-blue-600 text-white shadow-xs shadow-blue-600/20"
+                                    : "bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200"
+                            }`}
+                        >
+                            Leads ({stats.leadTemplates})
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setTargetTypeFilter(targetTypeFilter === "student" ? "" : "student"); setPage(1); }}
+                            className={`cursor-pointer px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
+                                targetTypeFilter === "student"
+                                    ? "bg-purple-600 text-white shadow-xs shadow-purple-600/20"
+                                    : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200"
+                            }`}
+                        >
+                            Students ({stats.studentTemplates})
+                        </button>
                     </div>
 
                     {/* Expandable Advanced Filters Grid */}

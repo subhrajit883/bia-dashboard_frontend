@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
 import {
     User, Mail, Phone, MapPin, Calendar, BookOpen, UserCheck, IndianRupee, CreditCard, FileText, UploadCloud, Plus,
     Trash2, CheckCircle2, Copy, Check, Eye, EyeOff,
@@ -182,6 +183,29 @@ function CounsellorEditStudent() {
                 const token = localStorage.getItem("token");
                 const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
+                // Immediate check if state already has student data
+                if (location.state?.student) {
+                    const s = location.state.student;
+                    let loggedInCounsellorId = null;
+                    if (token) {
+                        try {
+                            const decoded = typeof jwtDecode === "function" ? jwtDecode(token) : null;
+                            loggedInCounsellorId = decoded?.id || decoded?._id || decoded?.userId || null;
+                        } catch {
+                            // ignore
+                        }
+                    }
+                    const assignedCounsellorId =
+                        typeof s.assignedCounsellor === "object"
+                            ? s.assignedCounsellor?._id || s.assignedCounsellor?.id
+                            : s.assignedCounsellor;
+                    if (loggedInCounsellorId && assignedCounsellorId && String(assignedCounsellorId) !== String(loggedInCounsellorId)) {
+                        toast.error("You cannot edit this student because they are not assigned to you.");
+                        navigate("/counsellor/students", { replace: true });
+                        return;
+                    }
+                }
+
                 // 1. Fetch courses
                 const coursesPromise = axios
                     .get(courseUrl.courses, { headers })
@@ -261,6 +285,30 @@ function CounsellorEditStudent() {
 
                 if (studentResult.status === "fulfilled" && studentResult.value) {
                     const s = studentResult.value;
+
+                    // Verify if this counsellor is assigned to the student
+                    let loggedInCounsellorId = null;
+                    const cToken = localStorage.getItem("token");
+                    if (cToken) {
+                        try {
+                            const decoded = typeof jwtDecode === "function" ? jwtDecode(cToken) : null;
+                            loggedInCounsellorId = decoded?.id || decoded?._id || decoded?.userId || null;
+                        } catch {
+                            // ignore
+                        }
+                    }
+
+                    const assignedCounsellorId =
+                        typeof s.assignedCounsellor === "object"
+                            ? s.assignedCounsellor?._id || s.assignedCounsellor?.id
+                            : s.assignedCounsellor;
+
+                    if (loggedInCounsellorId && assignedCounsellorId && String(assignedCounsellorId) !== String(loggedInCounsellorId)) {
+                        toast.error("You cannot edit this student because they are not assigned to you.");
+                        navigate("/counsellor/students", { replace: true });
+                        return;
+                    }
+
                     setStudentDetails(s);
                     const parsed = parseStudentToFormData(s);
                     setFormData(parsed);
@@ -1581,9 +1629,6 @@ function CounsellorEditStudent() {
                     </div>
                 )}
 
-                {/* ========================================================================= */}
-                {/* STEP 3: UPDATE CONFIRMATION & SUMMARY */}
-                {/* ========================================================================= */}
                 {currentStep === 3 && (
                     <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm text-center space-y-6">
                         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 shadow-lg shadow-emerald-500/20">

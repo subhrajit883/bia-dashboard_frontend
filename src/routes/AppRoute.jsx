@@ -55,8 +55,6 @@ const AppRoute = () => {
                 {/* Main Website Layout */}
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<HomePage />} />
-
-                    <Route path="*" element={<NotFound />} />
                 </Route>
 
                 {/* Admin Routes */}
@@ -95,6 +93,10 @@ const AppRoute = () => {
                     <Route path="/admin/emailtemplate" element={<AdminEmail />} />
                     <Route path="/admin/sendemail" element={<AdminSendEmail />} />
                     <Route path="/admin/settings" element={<AdminSettings />} />
+
+                    {/* Any unmatched route inside admin redirects to homepage */}
+                    <Route path="/admin/*" element={<Navigate to="/" replace />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
                 </Route>
 
                 <Route
@@ -153,8 +155,14 @@ const AppRoute = () => {
                     <Route path="/counsellor/emails" element={<CounsellorSendEmail />} />
                     <Route path="/counsellor/profile" element={<CounsellorProfile />} />
                     <Route path="/counsellor/profile/:id" element={<CounsellorProfile />} />
+
+                    {/* Any unmatched route inside counsellor redirects to homepage */}
+                    <Route path="/counsellor/*" element={<Navigate to="/" replace />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
                 </Route>
 
+                {/* Global catch-all for any unknown route redirects to homepage */}
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
 
         </BrowserRouter>
